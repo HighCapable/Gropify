@@ -1,0 +1,21 @@
+[versions]
+kotlin = "2.2.21"
+jackson = "3.0.1"
+kavaref-core = "1.0.2"
+kavaref-extension = "1.0.1"
+kotlinpoet = "2.2.0"
+javapoet = "0.7.0"
+zip4j = "2.11.5"
+maven-publish = "0.34.0"
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }
+
+[libraries]
+jackson-module-kotlin = { module = "tools.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
+kavaref-core = { module = "com.highcapable.kavaref:kavaref-core", version.ref = "kavaref-core" }
+kavaref-extension = { module = "com.highcapable.kavaref:kavaref-extension", version.ref = "kavaref-extension" }
+kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
+javapoet = { module = "com.palantir.javapoet:javapoet", version.ref = "javapoet" }
+zip4j = { module = "net.lingala.zip4j:zip4j", version.ref = "zip4j" }
