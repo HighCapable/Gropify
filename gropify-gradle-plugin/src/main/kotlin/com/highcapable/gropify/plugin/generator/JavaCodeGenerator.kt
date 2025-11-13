@@ -27,7 +27,6 @@ import com.highcapable.gropify.plugin.config.proxy.GropifyConfig
 import com.highcapable.gropify.plugin.generator.config.GenerateConfig
 import com.highcapable.gropify.plugin.generator.config.SourceCodeSpec
 import com.highcapable.gropify.plugin.generator.extension.PropertyMap
-import com.highcapable.gropify.plugin.generator.extension.createTypedValue
 import com.highcapable.gropify.plugin.generator.extension.toOptimize
 import com.highcapable.gropify.plugin.generator.extension.toPoetNoEscape
 import com.highcapable.gropify.plugin.generator.extension.toPoetSpace
@@ -62,17 +61,18 @@ internal class JavaCodeGenerator {
 
             if (!config.isRestrictedAccessEnabled) addModifiers(Modifier.PUBLIC)
             keyValues.toOptimize().toUnderscores().forEach { (key, value) ->
-                val typedValue = value.second.createTypedValue(config.useTypeAutoConversion)
+                val currentKey = value.first
+                val currentValue = value.second
 
                 addField(
-                    FieldSpec.builder(typedValue.first.java, key.firstNumberToLetter()).apply {
-                        addJavadoc("Resolve the \"${value.first.toPoetNoEscape()}\" value \"${value.second.toString().toPoetNoEscape()}\".")
+                    FieldSpec.builder(currentValue.type.java, key.firstNumberToLetter()).apply {
+                        addJavadoc("Resolve the \"${currentKey.toPoetNoEscape()}\" value \"${currentValue.raw.toPoetNoEscape()}\".")
 
                         if (!config.isRestrictedAccessEnabled)
                             addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
                         else addModifiers(Modifier.STATIC, Modifier.FINAL)
 
-                        initializer(typedValue.second.toPoetNoEscape().toPoetSpace())
+                        initializer(currentValue.codeValue.toPoetNoEscape().toPoetSpace())
                     }.build()
                 )
             }

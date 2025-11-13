@@ -29,7 +29,7 @@ import com.highcapable.gropify.plugin.Gropify
 import com.highcapable.gropify.plugin.config.proxy.GropifyConfig
 import com.highcapable.gropify.plugin.extension.accessors.proxy.ExtensionAccessors
 import com.highcapable.gropify.plugin.generator.extension.PropertyMap
-import com.highcapable.gropify.plugin.generator.extension.createTypedValue
+import com.highcapable.gropify.plugin.generator.extension.PropertyTypeValue
 import com.highcapable.gropify.plugin.generator.extension.toOptimize
 import com.highcapable.gropify.plugin.generator.extension.toPoetNoEscape
 import com.highcapable.gropify.utils.extension.capitalize
@@ -43,7 +43,6 @@ import com.palantir.javapoet.JavaFile
 import com.palantir.javapoet.MethodSpec
 import com.palantir.javapoet.TypeSpec
 import javax.lang.model.element.Modifier
-import kotlin.properties.Delegates
 
 /**
  * Generator for buildscript accessors classes.
@@ -69,8 +68,6 @@ internal class BuildscriptGenerator {
             else -> NonNullApiClass
         }
     }
-
-    private var config by Delegates.notNull<GropifyConfig.BuildscriptGenerateConfig>()
 
     private val classSpecs = mutableMapOf<String, TypeSpec.Builder>()
     private val constructorSpecs = mutableMapOf<String, MethodSpec.Builder>()
@@ -135,16 +132,15 @@ internal class BuildscriptGenerator {
             }.build()
         )
 
-    private fun TypeSpec.Builder.addFinalValueMethod(accessorsName: String, methodName: String, className: String, value: Any) =
+    private fun TypeSpec.Builder.addFinalValueMethod(accessorsName: String, methodName: String, className: String, value: PropertyTypeValue) =
         addMethod(
             MethodSpec.methodBuilder("get${getOrCreateUsedSuccessiveMethodName(methodName, className).capitalize()}").apply {
-                val typedValue = value.createTypedValue(config.useTypeAutoConversion)
-                val safeValueForJavadoc = typedValue.second.replace("$", "$$")
+                val safeValueForJavadoc = value.codeValue.replace("$", "$$")
 
-                addJavadoc("Resolve the \"$accessorsName\" value \"${value.toString().toPoetNoEscape()}\".")
+                addJavadoc("Resolve the \"$accessorsName\" value \"${value.raw.toPoetNoEscape()}\".")
 
                 addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                returns(typedValue.first.java)
+                returns(value.type.java)
                 addStatement("return $safeValueForJavadoc")
             }.build()
         )
@@ -176,7 +172,7 @@ internal class BuildscriptGenerator {
      *
      * After the parsing is completed, we need to call [releaseParseTypeSpec] to complete the parsing.
      */
-    private fun parseTypeSpec(successiveName: String, key: String, value: Any) {
+    private fun parseTypeSpec(successiveName: String, key: String, value: PropertyTypeValue) {
         fun String.duplicateGrandSuccessiveIndex() = lowercase().let { name ->
             if (grandSuccessiveDuplicateIndexes.contains(name)) {
                 grandSuccessiveDuplicateIndexes[name] = (grandSuccessiveDuplicateIndexes[name] ?: 1) + 1
@@ -273,8 +269,6 @@ internal class BuildscriptGenerator {
         Gropify.require(config.name.isNotBlank()) {
             "Class name cannot be empty or blank."
         }
-
-        this.config = config
 
         val topClassName = "${config.name.replace(":", "_").upperCamelcase()}$TOP_CLASS_SUFFIX_NAME"
 

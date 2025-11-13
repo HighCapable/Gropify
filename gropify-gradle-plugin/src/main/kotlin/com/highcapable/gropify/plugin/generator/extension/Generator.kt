@@ -21,62 +21,11 @@
  */
 package com.highcapable.gropify.plugin.generator.extension
 
-import com.highcapable.gropify.utils.extension.isNumeric
 import com.highcapable.gropify.utils.extension.underscore
-import kotlin.reflect.KClass
 
-internal typealias PropertyMap = MutableMap<String, Any>
-internal typealias PropertyOptimizeMap = MutableMap<String, Pair<String, Any>>
+internal typealias PropertyMap = MutableMap<String, PropertyTypeValue>
+internal typealias PropertyOptimizeMap = MutableMap<String, Pair<String, PropertyTypeValue>>
 internal typealias PropertyValueRule = (value: String) -> String
-
-/**
- * Create typed value from [Any] value.
- * @param autoConversion whether to enable auto conversion.
- * @return [Pair]<[KClass], [String]>
- */
-internal fun Any.createTypedValue(autoConversion: Boolean): Pair<KClass<*>, String> {
-    var isStringType = false
-    val valueString = toString()
-        .replace("\n", "\\n")
-        .replace("\r", "\\r")
-        .replace("\\", "\\\\")
-        .let {
-            if (autoConversion && (it.startsWith("\"") && it.endsWith("\"") || it.startsWith("'") && it.endsWith("'"))) {
-                isStringType = true
-                it.drop(1).dropLast(1)
-            } else it.replace("\"", "\\\"")
-        }
-
-    if (!autoConversion) return String::class to "\"$valueString\""
-
-    val trimmed = valueString.trim()
-    val typeSpec = when {
-        isStringType -> String::class
-        trimmed.toBooleanStrictOrNull() != null -> Boolean::class
-        trimmed.isNumeric() ->
-            if (!trimmed.contains(".")) {
-                val longValue = trimmed.toLongOrNull()
-                when (longValue) {
-                    null -> String::class
-                    in Int.MIN_VALUE..Int.MAX_VALUE -> Int::class
-                    else -> Long::class
-                }
-            } else {
-                val doubleValue = trimmed.toDoubleOrNull()
-                if (doubleValue == null || doubleValue.isInfinite()) 
-                    String::class
-                else Double::class
-            }
-        else -> String::class
-    }
-    val finalValue = when (typeSpec) {
-        String::class -> "\"$valueString\""
-        Long::class -> if (trimmed.endsWith("L")) trimmed else "${trimmed}L"
-        else -> trimmed
-    }
-
-    return typeSpec to finalValue
-}
 
 /**
  * Optimize property keys for code generation.

@@ -28,6 +28,9 @@ import com.highcapable.gropify.plugin.config.type.GropifyLocation
 import com.highcapable.gropify.plugin.deployer.BuildscriptDeployer
 import com.highcapable.gropify.plugin.deployer.SourceCodeDeployer
 import com.highcapable.gropify.plugin.generator.extension.PropertyMap
+import com.highcapable.gropify.plugin.generator.extension.PropertyTypeValue
+import com.highcapable.gropify.plugin.generator.extension.createTypeValue
+import com.highcapable.gropify.plugin.generator.extension.createTypeValueByType
 import com.highcapable.gropify.utils.extension.hasInterpolation
 import com.highcapable.gropify.utils.extension.removeSurroundingQuotes
 import com.highcapable.gropify.utils.extension.replaceInterpolation
@@ -100,10 +103,10 @@ internal object DefaultDeployer {
      * @return [PropertyMap]
      */
     fun generateMap(config: GropifyConfig.CommonGenerateConfig, descriptor: ProjectDescriptor): PropertyMap {
-        val properties = mutableMapOf<String, Any>()
+        val properties = mutableMapOf<String, PropertyTypeValue>()
         val resolveProperties = mutableMapOf<Any?, Any?>()
 
-        config.permanentKeyValues.forEach { (key, value) -> properties[key] = value }
+        config.permanentKeyValues.forEach { (key, value) -> properties[key] = value.createTypeValueByType(config.useTypeAutoConversion) }
         config.locations.forEach { location ->
             when (location) {
                 GropifyLocation.CurrentProject -> createProperties(config, descriptor.currentDir).forEach { resolveProperties.putAll(it) }
@@ -156,11 +159,13 @@ internal object DefaultDeployer {
                 config.keyValuesRules[key]?.also { resolveKeyValues[key] = it(value) }
             }
 
-            properties.putAll(resolveKeyValues)
+            properties.putAll(resolveKeyValues.map { (key, value) ->
+                key to value.createTypeValue(config.useTypeAutoConversion)
+            })
         }
 
         // Replace all key-values if exists.
-        config.replacementKeyValues.forEach { (key, value) -> properties[key] = value }
+        config.replacementKeyValues.forEach { (key, value) -> properties[key] = value.createTypeValueByType(config.useTypeAutoConversion) }
 
         return properties
     }
