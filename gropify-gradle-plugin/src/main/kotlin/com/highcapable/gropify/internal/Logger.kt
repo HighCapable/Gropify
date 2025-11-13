@@ -26,26 +26,34 @@ package com.highcapable.gropify.internal
 import com.highcapable.gropify.plugin.Gropify
 import org.gradle.api.Project
 import org.gradle.api.logging.Logger
-import kotlin.properties.Delegates
 
 /**
  * Gropify logger.
  */
-internal object Logger {
+internal class Logger private constructor() {
 
-    private var logger by Delegates.notNull<Logger>()
+    internal companion object {
 
-    /**
-     * Initialize logger with project.
-     * @param project the project.
-     * @return [Logger]
-     */
-    fun init(project: Project) = apply {
-        logger = project.logger
+        /**
+         * Create logger with project.
+         * @param project the project.
+         * @return [Logger]
+         */
+        fun with(project: Project) = Logger().apply {
+            logger = project.logger
+        }
+
+        /**
+         * Create empty logger instance.
+         * @return [Logger]
+         */
+        fun get() = Logger()
     }
 
-    internal fun debug(msg: Any) = logger.debug("[${Gropify.TAG}] $msg")
-    internal fun info(msg: Any) = logger.info("[${Gropify.TAG}] $msg")
-    internal fun warn(msg: Any) = logger.warn("[${Gropify.TAG}] $msg")
-    internal fun error(msg: Any) = logger.error("[${Gropify.TAG}] $msg")
+    private var logger: Logger? = null
+
+    internal fun debug(msg: Any) = "[${Gropify.TAG}][DEBUG] $msg".let { logger?.debug(it) ?: println(it) }
+    internal fun info(msg: Any) = "[${Gropify.TAG}][INFO] $msg".let { logger?.info(it) ?: println(it) }
+    internal fun warn(msg: Any) = "[${Gropify.TAG}][WARN] $msg".let { logger?.warn(it) ?: println(it) }
+    internal fun error(msg: Any) = "[${Gropify.TAG}][ERROR] $msg".let { logger?.error(it) ?: println(it) }
 }

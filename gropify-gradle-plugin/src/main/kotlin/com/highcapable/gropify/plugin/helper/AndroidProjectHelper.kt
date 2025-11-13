@@ -73,7 +73,7 @@ internal object AndroidProjectHelper {
         }.onFailure {
             // If file broken, reset it.
             namespacesFile.writeText("{}")
-            Logger.warn("Android project namespaces file was broken and has been reset.")
+            Logger.with(this).warn("Android project namespaces file was broken and has been reset.")
         }.getOrDefault(hashMapOf())
 
         val namespace = getExtensionNamespace()

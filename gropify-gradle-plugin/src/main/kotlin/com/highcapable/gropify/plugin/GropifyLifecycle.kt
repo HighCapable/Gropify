@@ -24,7 +24,6 @@ package com.highcapable.gropify.plugin
 import com.highcapable.gropify.gradle.api.GradleDescriptor
 import com.highcapable.gropify.gradle.api.extension.getOrCreate
 import com.highcapable.gropify.gradle.api.plugin.PluginLifecycle
-import com.highcapable.gropify.internal.Logger
 import com.highcapable.gropify.internal.error
 import com.highcapable.gropify.plugin.extension.dsl.configure.GropifyConfigureExtension
 import org.gradle.api.Project
@@ -50,7 +49,6 @@ internal class GropifyLifecycle : PluginLifecycle {
     }
 
     override fun beforeProjectEvaluate(rootProject: Project) {
-        Logger.init(rootProject)
         DefaultDeployer.resolve(rootProject)
     }
 

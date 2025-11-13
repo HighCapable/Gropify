@@ -56,7 +56,7 @@ class GropifyPlugin<T : ExtensionAware> internal constructor() : Plugin<T> {
                 }
             }
         }
-        is Project -> Logger.init(target).error(
+        is Project -> Logger.with(target).error(
             "Gropify can only applied in settings.gradle or settings.gradle.kts, but current is $target, stop loading.",
         )
         else -> Gropify.error("Gropify applied to an unknown target: $target, stop loading.")

@@ -157,7 +157,7 @@ internal class SourceCodeDeployer(private val _config: () -> GropifyConfig) : De
             it?.asResolver()?.optional(!debugMode)?.firstMethodOrNull {
                 name = "getName"
             }?.invokeQuietly<String>() == config.sourceSetName
-        } ?: return Logger.warn(
+        } ?: return Logger.with(project).warn(
             "Could not found source sets \"${config.sourceSetName}\" in project '${project.getFullName()}' ($projectType)."
         )
 
@@ -179,7 +179,7 @@ internal class SourceCodeDeployer(private val _config: () -> GropifyConfig) : De
                 parameters(Any::class)
                 superclass()
             }
-            resolver?.invokeQuietly(generateDirPath) ?: Logger.error(
+            resolver?.invokeQuietly(generateDirPath) ?: Logger.with(project).error(
                 "Project '${project.getFullName()}' source sets deployed failed, method \"srcDir\" maybe failed during the processing."
             )
         }

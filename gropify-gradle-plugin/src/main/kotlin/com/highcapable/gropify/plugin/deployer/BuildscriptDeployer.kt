@@ -82,7 +82,7 @@ internal class BuildscriptDeployer(private val _config: () -> GropifyConfig) : D
         ) return
 
         cachedSettingsProperties = allProperties
-        buildscriptGenerator.build(allConfig, allProperties).compile(
+        buildscriptGenerator.build(config, allConfig, allProperties).compile(
             buildscriptAccessorsDependency,
             buildscriptAccessorsDir.absolutePath,
             buildscriptGenerator.compileStubFiles
