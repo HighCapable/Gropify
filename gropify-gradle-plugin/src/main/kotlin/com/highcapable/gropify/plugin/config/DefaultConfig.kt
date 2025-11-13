@@ -64,9 +64,9 @@ internal object DefaultConfig {
                 ?: createCommonGenerateConfig(name).permanentKeyValues
 
         override val replacementKeyValues
-            get() = selfCommon?.permanentKeyValues
-                ?: globalCommon?.permanentKeyValues
-                ?: createCommonGenerateConfig(name).permanentKeyValues
+            get() = selfCommon?.replacementKeyValues
+                ?: globalCommon?.replacementKeyValues
+                ?: createCommonGenerateConfig(name).replacementKeyValues
 
         override val excludeKeys
             get() = selfCommon?.excludeKeys
@@ -142,9 +142,9 @@ internal object DefaultConfig {
                 ?: createCommonGenerateConfig(name).permanentKeyValues
 
         override val replacementKeyValues
-            get() = selfCommon?.permanentKeyValues
-                ?: globalCommon?.permanentKeyValues
-                ?: createCommonGenerateConfig(name).permanentKeyValues
+            get() = selfCommon?.replacementKeyValues
+                ?: globalCommon?.replacementKeyValues
+                ?: createCommonGenerateConfig(name).replacementKeyValues
 
         override val excludeKeys
             get() = selfCommon?.excludeKeys
@@ -220,9 +220,9 @@ internal object DefaultConfig {
                 ?: createCommonGenerateConfig(name).permanentKeyValues
 
         override val replacementKeyValues
-            get() = selfCommon?.permanentKeyValues
-                ?: globalCommon?.permanentKeyValues
-                ?: createCommonGenerateConfig(name).permanentKeyValues
+            get() = selfCommon?.replacementKeyValues
+                ?: globalCommon?.replacementKeyValues
+                ?: createCommonGenerateConfig(name).replacementKeyValues
 
         override val excludeKeys
             get() = selfCommon?.excludeKeys
@@ -296,9 +296,9 @@ internal object DefaultConfig {
                 ?: createCommonGenerateConfig(name).permanentKeyValues
 
         override val replacementKeyValues
-            get() = selfCommon?.permanentKeyValues
-                ?: globalCommon?.permanentKeyValues
-                ?: createCommonGenerateConfig(name).permanentKeyValues
+            get() = selfCommon?.replacementKeyValues
+                ?: globalCommon?.replacementKeyValues
+                ?: createCommonGenerateConfig(name).replacementKeyValues
 
         override val excludeKeys
             get() = selfCommon?.excludeKeys
