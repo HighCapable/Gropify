@@ -56,12 +56,17 @@ internal fun Any.createTypedValue(autoConversion: Boolean): Pair<KClass<*>, Stri
         trimmed.isNumeric() ->
             if (!trimmed.contains(".")) {
                 val longValue = trimmed.toLongOrNull()
-                when {
-                    longValue == null -> String::class
-                    longValue > Int.MAX_VALUE -> Long::class
-                    else -> Int::class
+                when (longValue) {
+                    null -> String::class
+                    in Int.MIN_VALUE..Int.MAX_VALUE -> Int::class
+                    else -> Long::class
                 }
-            } else Double::class
+            } else {
+                val doubleValue = trimmed.toDoubleOrNull()
+                if (doubleValue == null || doubleValue.isInfinite()) 
+                    String::class
+                else Double::class
+            }
         else -> String::class
     }
     val finalValue = when (typeSpec) {
