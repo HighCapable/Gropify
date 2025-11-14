@@ -299,7 +299,12 @@ common {
     // These key-values rules are applied when properties' keys exist.
     keyValuesRules(
         "some.key1" to ValueRule { if (it.contains("_")) it.replace("_", "-") else it },
-        "some.key2" to ValueRule { "$it-value" }
+        "some.key2" to ValueRule { "$it-value" },
+        // You can also specify the expected type class,
+        // the type you specify will be used during generation,
+        // and an exception will be thrown if the type cannot be converted correctly.
+        // If the [useTypeAutoConversion] is not enabled, this parameter will be ignored.
+        "some.key3" to ValueRule(Int::class)
     )
 
     // Set where to find properties' key-values.

@@ -283,7 +283,11 @@ common {
     // 当属性键存在时应用这些键值规则
     keyValuesRules(
         "some.key1" to ValueRule { if (it.contains("_")) it.replace("_", "-") else it },
-        "some.key2" to ValueRule { "$it-value" }
+        "some.key2" to ValueRule { "$it-value" },
+        // 你还可以指定期望的类型类，生成时将使用你指定的类型，
+        // 如果类型无法正确转换，将抛出异常
+        // 如果未启用 [useTypeAutoConversion]，此参数将被忽略
+        "some.key3" to ValueRule(Int::class)
     )
 
     // 设置查找属性键值的位置
