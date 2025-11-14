@@ -145,8 +145,10 @@ internal fun Any.createTypeValueByType(autoConversion: Boolean, key: String): Pr
         .replace("\"", "\\\"")
 
     val trimmed = valueString.trim()
+    
+    if (!autoConversion) return PropertyTypeValue(this.toString(), "\"$valueString\"", String::class)
 
-    val finalValue = if (autoConversion) when (typeSpec) {
+    val finalValue = when (typeSpec) {
         String::class, CharSequence::class -> "\"$trimmed\""
         Char::class -> "'$trimmed'"
         Boolean::class -> trimmed
@@ -157,7 +159,7 @@ internal fun Any.createTypeValueByType(autoConversion: Boolean, key: String): Pr
             "Unsupported property \"$key\" value type: ${typeSpec.qualifiedName}, " +
                 "only String, CharSequence, Char, Boolean, Int, Long, Float, Double are supported."
         )
-    } else "\"$valueString\""
+    }
 
     return PropertyTypeValue(this.toString(), finalValue, typeSpec)
 }
