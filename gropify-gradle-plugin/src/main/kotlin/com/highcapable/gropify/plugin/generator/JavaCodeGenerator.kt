@@ -28,8 +28,7 @@ import com.highcapable.gropify.plugin.generator.config.GenerateConfig
 import com.highcapable.gropify.plugin.generator.config.SourceCodeSpec
 import com.highcapable.gropify.plugin.generator.extension.PropertyMap
 import com.highcapable.gropify.plugin.generator.extension.toOptimize
-import com.highcapable.gropify.plugin.generator.extension.toPoetNoEscape
-import com.highcapable.gropify.plugin.generator.extension.toPoetSpace
+import com.highcapable.gropify.plugin.generator.extension.toPoetGenerationContent
 import com.highcapable.gropify.plugin.generator.extension.toUnderscores
 import com.highcapable.gropify.utils.extension.firstNumberToLetter
 import com.palantir.javapoet.ClassName
@@ -66,13 +65,13 @@ internal class JavaCodeGenerator {
 
                 addField(
                     FieldSpec.builder(currentValue.type.java, key.firstNumberToLetter()).apply {
-                        addJavadoc("Resolve the \"${currentKey.toPoetNoEscape()}\" value \"${currentValue.raw.toPoetNoEscape()}\".")
+                        addJavadoc("Resolve the \$S value \$S.", currentKey, currentValue.raw)
 
                         if (!config.isRestrictedAccessEnabled)
                             addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
                         else addModifiers(Modifier.STATIC, Modifier.FINAL)
 
-                        initializer(currentValue.codeValue.toPoetNoEscape().toPoetSpace())
+                        initializer(currentValue.codeValue.toPoetGenerationContent())
                     }.build()
                 )
             }
@@ -88,5 +87,5 @@ internal class JavaCodeGenerator {
             )
         }.build()
         SourceCodeSpec(SourceCodeSpec.Type.Java, javaFile)
-    }.getOrElse { Gropify.error("Failed to generated Java file.\n$it") }
+    }.getOrElse { Gropify.error("Failed to generated Java file.\n${it.stackTraceToString()}") }
 }

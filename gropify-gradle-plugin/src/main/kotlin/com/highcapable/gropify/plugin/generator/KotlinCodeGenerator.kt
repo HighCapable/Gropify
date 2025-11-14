@@ -28,8 +28,7 @@ import com.highcapable.gropify.plugin.generator.config.GenerateConfig
 import com.highcapable.gropify.plugin.generator.config.SourceCodeSpec
 import com.highcapable.gropify.plugin.generator.extension.PropertyMap
 import com.highcapable.gropify.plugin.generator.extension.toOptimize
-import com.highcapable.gropify.plugin.generator.extension.toPoetNoEscape
-import com.highcapable.gropify.plugin.generator.extension.toPoetSpace
+import com.highcapable.gropify.plugin.generator.extension.toPoetGenerationContent
 import com.highcapable.gropify.plugin.generator.extension.toUnderscores
 import com.highcapable.gropify.utils.extension.firstNumberToLetter
 import com.squareup.kotlinpoet.FileSpec
@@ -69,16 +68,16 @@ internal class KotlinCodeGenerator {
                     val currentValue = value.second
 
                     addProperty(PropertySpec.builder(key.firstNumberToLetter(), currentValue.type).apply {
-                        addKdoc("Resolve the \"${currentKey.toPoetNoEscape()}\" value \"${currentValue.raw.toPoetNoEscape()}\".")
+                        addKdoc("Resolve the %S value %S.", currentKey, currentValue.raw)
 
                         if (config.isRestrictedAccessEnabled) addModifiers(KModifier.INTERNAL)
                         addModifiers(KModifier.CONST)
-                        initializer(currentValue.codeValue.toPoetNoEscape().toPoetSpace())
+                        initializer(currentValue.codeValue.toPoetGenerationContent())
                     }.build())
                 }
             }.build())
         }.build()
 
         SourceCodeSpec(SourceCodeSpec.Type.Kotlin, fileSpec)
-    }.getOrElse { Gropify.error("Failed to generated Kotlin file.\n$it") }
+    }.getOrElse { Gropify.error("Failed to generated Kotlin file.\n${it.stackTraceToString()}") }
 }

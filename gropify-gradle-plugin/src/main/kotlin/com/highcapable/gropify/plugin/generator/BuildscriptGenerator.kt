@@ -31,7 +31,6 @@ import com.highcapable.gropify.plugin.extension.accessors.proxy.ExtensionAccesso
 import com.highcapable.gropify.plugin.generator.extension.PropertyMap
 import com.highcapable.gropify.plugin.generator.extension.PropertyTypeValue
 import com.highcapable.gropify.plugin.generator.extension.toOptimize
-import com.highcapable.gropify.plugin.generator.extension.toPoetNoEscape
 import com.highcapable.gropify.utils.extension.capitalize
 import com.highcapable.gropify.utils.extension.firstNumberToLetter
 import com.highcapable.gropify.utils.extension.uncapitalize
@@ -95,7 +94,7 @@ internal class BuildscriptGenerator {
     private fun createClassSpec(name: String, accessorsName: String = "", isInner: Boolean = true) =
         TypeSpec.classBuilder(if (isInner) name.capitalized() else name).apply {
             if (isInner) {
-                addJavadoc("The \"$accessorsName\" accessors.")
+                addJavadoc("The \$S accessors.", accessorsName)
 
                 addSuperinterface(classOf<ExtensionAccessors>())
                 addModifiers(Modifier.PUBLIC, Modifier.STATIC)
@@ -117,14 +116,14 @@ internal class BuildscriptGenerator {
 
     private fun TypeSpec.Builder.addSuccessiveField(accessorsName: String, className: String) = addField(
         FieldSpec.builder(className.capitalized().asClassType(), className.uncapitalized(), Modifier.PRIVATE, Modifier.FINAL).apply {
-            addJavadoc("Create the \"$accessorsName\" accessors.")
+            addJavadoc("Create the \$S accessors.", accessorsName)
         }.build()
     )
 
     private fun TypeSpec.Builder.addSuccessiveMethod(accessorsName: String, methodName: String, className: String) =
         addMethod(
             MethodSpec.methodBuilder("get${getOrCreateUsedSuccessiveMethodName(methodName, className).capitalize()}").apply {
-                addJavadoc("Resolve the \"$accessorsName\" accessors.")
+                addJavadoc("Resolve the \$S accessors.", accessorsName)
 
                 addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 returns(className.capitalized().asClassType())
@@ -137,7 +136,7 @@ internal class BuildscriptGenerator {
             MethodSpec.methodBuilder("get${getOrCreateUsedSuccessiveMethodName(methodName, className).capitalize()}").apply {
                 val safeValueForJavadoc = value.codeValue.replace("$", "$$")
 
-                addJavadoc("Resolve the \"$accessorsName\" value \"${value.raw.toPoetNoEscape()}\".")
+                addJavadoc("Resolve the \$S value \$S.", accessorsName, value.raw)
 
                 addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 returns(value.type.java)
