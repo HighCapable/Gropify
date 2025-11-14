@@ -106,7 +106,9 @@ internal object DefaultDeployer {
         val properties = mutableMapOf<String, PropertyTypeValue>()
         val resolveProperties = mutableMapOf<Any?, Any?>()
 
-        config.permanentKeyValues.forEach { (key, value) -> properties[key] = value.createTypeValueByType(config.useTypeAutoConversion) }
+        config.permanentKeyValues.forEach { (key, value) ->
+            properties[key] = value.createTypeValueByType(config.useTypeAutoConversion, key)
+        }
         config.locations.forEach { location ->
             when (location) {
                 GropifyLocation.CurrentProject -> createProperties(config, descriptor.currentDir).forEach { resolveProperties.putAll(it) }
@@ -136,7 +138,7 @@ internal object DefaultDeployer {
                 }
             } ?: true
         }.toMutableMap().also { resolveKeyValues ->
-            resolveKeyValues.onEach { (key, value) ->
+            resolveKeyValues.forEach { (key, value) ->
                 val resolveKeys = mutableListOf<String>()
 
                 fun String.resolveValue(): String = replaceInterpolation { matchKey ->
@@ -155,17 +157,25 @@ internal object DefaultDeployer {
                 }
 
                 if (value.hasInterpolation()) resolveKeyValues[key] = value.resolveValue()
-            }.takeIf { config.keyValuesRules.isNotEmpty() }?.forEach { (key, value) ->
-                config.keyValuesRules[key]?.also { resolveKeyValues[key] = it(value) }
             }
 
             properties.putAll(resolveKeyValues.map { (key, value) ->
-                key to value.createTypeValue(config.useTypeAutoConversion)
+                key to value.createTypeValue(config.useTypeAutoConversion, key)
             })
         }
 
         // Replace all key-values if exists.
-        config.replacementKeyValues.forEach { (key, value) -> properties[key] = value.createTypeValueByType(config.useTypeAutoConversion) }
+        config.replacementKeyValues.forEach { (key, value) ->
+            properties[key] = value.createTypeValueByType(config.useTypeAutoConversion, key)
+        }
+
+        // Apply key-values rules.
+        properties.forEach { (key, value) ->
+            val (mapper, type) = config.keyValuesRules[key] ?: return@forEach
+
+            val resolveValue = mapper(value.raw).createTypeValue(config.useTypeAutoConversion, key, type)
+            properties[key] = resolveValue
+        }
 
         return properties
     }

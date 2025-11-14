@@ -30,11 +30,13 @@ import com.highcapable.gropify.plugin.Gropify
 import com.highcapable.gropify.plugin.config.extension.create
 import com.highcapable.gropify.plugin.config.proxy.GropifyConfig
 import com.highcapable.gropify.plugin.config.type.GropifyLocation
+import com.highcapable.gropify.plugin.generator.extension.PropertyValueMapper
 import com.highcapable.gropify.plugin.generator.extension.PropertyValueRule
 import com.highcapable.gropify.utils.KeywordsDetector
 import com.highcapable.gropify.utils.extension.isStartsWithLetter
 import org.gradle.api.Action
 import org.gradle.api.initialization.Settings
+import kotlin.reflect.KClass
 
 /**
  * Configure extension for Gropify.
@@ -447,8 +449,13 @@ open class GropifyConfigureExtension internal constructor() {
          *
          * ```kotlin
          * keyValuesRules(
-         *     "some.key1" to createValueRule { if (it.contains("_")) it.replace("_", "-") else it },
-         *     "some.key2" to createValueRule { "$it-value" }
+         *     "some.key1" to ValueRule { if (it.contains("_")) it.replace("_", "-") else it },
+         *     "some.key2" to ValueRule { "$it-value" },
+         *     // You can also specify the expected type class,
+         *     // the type you specify will be used during generation,
+         *     // and an exception will be thrown if the type cannot be converted correctly.
+         *     // If the [useTypeAutoConversion] is not enabled, this parameter will be ignored.
+         *     "some.key3" to ValueRule(Int::class)
          * )
          * ```
          *
@@ -483,10 +490,13 @@ open class GropifyConfigureExtension internal constructor() {
 
         /**
          * Create a new properties' values rule.
+         * @param type specify the expected type class, or null to auto-detect,
+         * if the [useTypeAutoConversion] is not enabled, this parameter will be ignored.
          * @param rule callback current rule.
          * @return [PropertyValueRule]
          */
-        fun ValueRule(rule: PropertyValueRule) = rule
+        @JvmOverloads
+        fun ValueRule(type: KClass<*>? = null, rule: PropertyValueMapper = { it }) = rule to type
 
         /**
          * Set where to find properties' key-values.

@@ -22,6 +22,7 @@
 package com.highcapable.gropify.plugin.generator.extension
 
 import com.highcapable.gropify.internal.error
+import com.highcapable.gropify.internal.require
 import com.highcapable.gropify.plugin.Gropify
 import com.highcapable.gropify.utils.extension.isNumeric
 import kotlin.reflect.KClass
@@ -30,9 +31,12 @@ import kotlin.reflect.KClass
  * Create [PropertyTypeValue] from [String] value.
  * @receiver [String]
  * @param autoConversion whether to enable auto conversion.
+ * @param key the property key name.
+ * @param type specify the expected type class, or null to auto-detect,
+ * if the [autoConversion] is not `true`, this parameter will be ignored.
  * @return [PropertyTypeValue]
  */
-internal fun String.createTypeValue(autoConversion: Boolean): PropertyTypeValue {
+internal fun String.createTypeValue(autoConversion: Boolean, key: String, type: KClass<*>? = null): PropertyTypeValue {
     var isStringType = false
     val valueString = replace("\n", "\\n")
         .replace("\r", "\\r")
@@ -47,6 +51,56 @@ internal fun String.createTypeValue(autoConversion: Boolean): PropertyTypeValue 
     if (!autoConversion) return PropertyTypeValue(this, "\"$valueString\"", String::class)
 
     val trimmed = valueString.trim()
+
+    if (type != null) {
+        val finalValue = when (type) {
+            String::class -> "\"$valueString\""
+            CharSequence::class -> "\"$valueString\""
+            Char::class -> trimmed.firstOrNull()?.let { "'$it'" }
+                ?: Gropify.error("The \"$key\" value is empty and cannot be converted to Char type.")
+            Boolean::class -> if (trimmed.toBooleanStrictOrNull() != null)
+                trimmed
+            else ((trimmed.toIntOrNull() ?: 0) > 0).toString()
+            Int::class -> {
+                val intValue = trimmed.toIntOrNull()
+                Gropify.require(intValue != null && intValue in Int.MIN_VALUE..Int.MAX_VALUE) {
+                    "The \"$key\" value \"$this\" cannot be converted to Int type."
+                }
+
+                trimmed
+            }
+            Long::class -> {
+                Gropify.require(trimmed.toLongOrNull() != null) {
+                    "The \"$key\" value \"$this\" cannot be converted to Long type."
+                }
+
+                if (trimmed.endsWith("L")) trimmed else "${trimmed}L"
+            }
+            Double::class -> {
+                val doubleValue = trimmed.toDoubleOrNull()
+                Gropify.require(doubleValue != null && !doubleValue.isInfinite()) {
+                    "The \"$key\" value \"$this\" cannot be converted to Double type."
+                }
+                    
+                trimmed
+            }
+            Float::class -> {
+                val floatValue = trimmed.toFloatOrNull()
+                Gropify.require(floatValue != null && !floatValue.isInfinite()) {
+                    "The \"$key\" value \"$this\" cannot be converted to Float type."
+                }
+                    
+                if (trimmed.endsWith("f") || trimmed.endsWith("F")) trimmed else "${trimmed}f"
+            }
+            else -> Gropify.error(
+                "Unsupported property \"$key\" value type: ${type.qualifiedName}, " +
+                    "only String, CharSequence, Char, Boolean, Int, Long, Float, Double are supported."
+            )
+        }
+
+        return PropertyTypeValue(this, finalValue, type)
+    }
+
     val typeSpec = when {
         isStringType -> String::class
         trimmed.toBooleanStrictOrNull() != null -> Boolean::class
@@ -79,9 +133,10 @@ internal fun String.createTypeValue(autoConversion: Boolean): PropertyTypeValue 
  * Create [PropertyTypeValue] from [Any] value's type.
  * @receiver [Any]
  * @param autoConversion whether to enable auto conversion.
+ * @param key the property key name.
  * @return [PropertyTypeValue]
  */
-internal fun Any.createTypeValueByType(autoConversion: Boolean): PropertyTypeValue {
+internal fun Any.createTypeValueByType(autoConversion: Boolean, key: String): PropertyTypeValue {
     val typeSpec = this.javaClass.kotlin
     val valueString = toString()
         .replace("\n", "\\n")
@@ -94,12 +149,13 @@ internal fun Any.createTypeValueByType(autoConversion: Boolean): PropertyTypeVal
     val finalValue = if (autoConversion) when (typeSpec) {
         String::class, CharSequence::class -> "\"$trimmed\""
         Char::class -> "'$trimmed'"
+        Boolean::class -> trimmed
         Long::class -> if (trimmed.endsWith("L")) trimmed else "${trimmed}L"
         Float::class -> if (trimmed.endsWith("f") || trimmed.endsWith("F")) trimmed else "${trimmed}f"
         Int::class, Double::class -> trimmed
         else -> Gropify.error(
-            "Unsupported property value type: ${typeSpec.qualifiedName}, " +
-                "only String, CharSequence, Char, Int, Long, Float, Double are supported."
+            "Unsupported property \"$key\" value type: ${typeSpec.qualifiedName}, " +
+                "only String, CharSequence, Char, Boolean, Int, Long, Float, Double are supported."
         )
     } else "\"$valueString\""
 

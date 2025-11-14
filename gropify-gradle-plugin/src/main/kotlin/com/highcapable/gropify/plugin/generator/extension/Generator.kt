@@ -22,10 +22,12 @@
 package com.highcapable.gropify.plugin.generator.extension
 
 import com.highcapable.gropify.utils.extension.underscore
+import kotlin.reflect.KClass
 
 internal typealias PropertyMap = MutableMap<String, PropertyTypeValue>
 internal typealias PropertyOptimizeMap = MutableMap<String, Pair<String, PropertyTypeValue>>
-internal typealias PropertyValueRule = (value: String) -> String
+internal typealias PropertyValueMapper = (value: String) -> String
+internal typealias PropertyValueRule = Pair<PropertyValueMapper, KClass<*>?>
 
 /**
  * Optimize property keys for code generation.
