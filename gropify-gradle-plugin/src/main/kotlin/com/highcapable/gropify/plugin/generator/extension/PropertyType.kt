@@ -21,8 +21,8 @@
  */
 package com.highcapable.gropify.plugin.generator.extension
 
-import com.highcapable.gropify.internal.error
-import com.highcapable.gropify.internal.require
+import com.highcapable.gropify.debug.error
+import com.highcapable.gropify.debug.require
 import com.highcapable.gropify.plugin.Gropify
 import com.highcapable.gropify.utils.extension.isNumeric
 import kotlin.reflect.KClass
@@ -81,7 +81,7 @@ internal fun String.createTypeValue(autoConversion: Boolean, key: String, type: 
                 Gropify.require(doubleValue != null && !doubleValue.isInfinite()) {
                     "The \"$key\" value \"$this\" cannot be converted to Double type."
                 }
-                    
+
                 trimmed
             }
             Float::class -> {
@@ -89,7 +89,7 @@ internal fun String.createTypeValue(autoConversion: Boolean, key: String, type: 
                 Gropify.require(floatValue != null && !floatValue.isInfinite()) {
                     "The \"$key\" value \"$this\" cannot be converted to Float type."
                 }
-                    
+
                 if (trimmed.endsWith("f") || trimmed.endsWith("F")) trimmed else "${trimmed}f"
             }
             else -> Gropify.error(

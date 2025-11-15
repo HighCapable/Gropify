@@ -21,9 +21,10 @@
  */
 package com.highcapable.gropify.plugin.compiler
 
+import com.highcapable.gropify.debug.Logger
+import com.highcapable.gropify.debug.error
+import com.highcapable.gropify.debug.require
 import com.highcapable.gropify.gradle.api.entity.Dependency
-import com.highcapable.gropify.internal.error
-import com.highcapable.gropify.internal.require
 import com.highcapable.gropify.plugin.Gropify
 import com.highcapable.gropify.utils.extension.deleteEmptyRecursively
 import com.highcapable.gropify.utils.extension.toFile
@@ -111,7 +112,20 @@ internal object CodeCompiler {
             writeMetaInf(outputSourcesDir)
 
             createJar(dependency, outputDir, outputBuildDir, outputClassesDir, outputSourcesDir)
-        } else Gropify.error("Failed to compile java files into path: $outputDirPath\n$diagnosticsMessage")
+        } else {
+            Logger.debug("Compilation process failed, dumping source file content.")
+            files.forEach {
+                Logger.debug(
+                    "Check this Java file: ${it.name}\n" +
+                        "====== BEGIN FILE CONTENT ======\n" +
+                        "${it.getCharContent(true)}\n" +
+                        "====== END FILE CONTENT ======"
+                )
+            }
+            Logger.debug("Please report those file content to us, you can remove sensitive information before this.")
+
+            Gropify.error("Failed to compile Java files into path: $outputDirPath\n$diagnosticsMessage")
+        }
     }
 
     private fun createJar(dependency: Dependency, outputDir: File, buildDir: File, classesDir: File, sourcesDir: File) {

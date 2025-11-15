@@ -21,11 +21,11 @@
  */
 package com.highcapable.gropify.plugin.deployer
 
+import com.highcapable.gropify.debug.Logger
+import com.highcapable.gropify.debug.error
 import com.highcapable.gropify.gradle.api.entity.ProjectDescriptor
 import com.highcapable.gropify.gradle.api.extension.getFullName
 import com.highcapable.gropify.gradle.api.extension.getOrNull
-import com.highcapable.gropify.internal.Logger
-import com.highcapable.gropify.internal.error
 import com.highcapable.gropify.plugin.DefaultDeployer.generateMap
 import com.highcapable.gropify.plugin.Gropify
 import com.highcapable.gropify.plugin.config.extension.from
@@ -85,7 +85,7 @@ internal class SourceCodeDeployer(private val _config: () -> GropifyConfig) : De
             val sourceCodeType = decideSourceCodeType(config, projectType)
             val generateDirPath = resolveGenerateDirPath(config)
 
-            if (!config.isEnabled) return
+            if (!isEnabled(config)) return
 
             val outputDir = file(generateDirPath)
             val properties = generateMap(config, ProjectDescriptor.create(project = this))
@@ -107,7 +107,7 @@ internal class SourceCodeDeployer(private val _config: () -> GropifyConfig) : De
 
             val generateConfig = GenerateConfig(packageName, className)
 
-            sourceCodeGenerator.build(config, generateConfig, properties).let { generator ->
+            sourceCodeGenerator.build(projectType, config, generateConfig, properties).let { generator ->
                 generator.first { it.type == sourceCodeType }
             }.writeTo(outputDir)
             configureSourceSets(project = this)
@@ -133,6 +133,8 @@ internal class SourceCodeDeployer(private val _config: () -> GropifyConfig) : De
             } ?: return
         }
 
+        Logger.debug("Configuring source sets in project '${project.getFullName()}' (${projectType.name}).")
+
         val sourceCodeType = decideSourceCodeType(config, projectType)
         val resolveSourceCodeType = if (projectType == ProjectType.Java) SourceCodeSpec.Type.Java else sourceCodeType
         val generateDirPath = resolveGenerateDirPath(config)
@@ -147,7 +149,9 @@ internal class SourceCodeDeployer(private val _config: () -> GropifyConfig) : De
             ProjectType.Java -> javaExtension
             ProjectType.KMP -> kotlinExtension
             else -> return
-        } ?: return
+        } ?: return Logger.debug("No supportable extension found for configuring source sets in $project")
+
+        Logger.debug("Found $extension: ${extension.javaClass}")
 
         val collection = extension.asResolver().optional(!debugMode).firstMethodOrNull {
             name = "getSourceSets"
@@ -157,8 +161,8 @@ internal class SourceCodeDeployer(private val _config: () -> GropifyConfig) : De
             it?.asResolver()?.optional(!debugMode)?.firstMethodOrNull {
                 name = "getName"
             }?.invokeQuietly<String>() == config.sourceSetName
-        } ?: return Logger.with(project).warn(
-            "Could not found source sets \"${config.sourceSetName}\" in project '${project.getFullName()}' ($projectType)."
+        } ?: return Logger.warn(
+            "Could not found source set \"${config.sourceSetName}\" in project '${project.getFullName()}' ($projectType)."
         )
 
         val directorySet = sourceSet.asResolver().optional(!debugMode).firstMethodOrNull {
@@ -172,6 +176,8 @@ internal class SourceCodeDeployer(private val _config: () -> GropifyConfig) : De
             name = "getSrcDirs"
         }?.invokeQuietly<Set<*>>()
 
+        Logger.debug("Deploying generated source to \"$generateDirPath\".")
+
         val alreadyAdded = srcDirs?.any { it is File && it.canonicalPath.endsWith(generateDirPath) } == true
         if (!alreadyAdded) {
             val resolver = directorySet?.asResolver()?.optional(!debugMode)?.firstMethodOrNull {
@@ -179,10 +185,10 @@ internal class SourceCodeDeployer(private val _config: () -> GropifyConfig) : De
                 parameters(Any::class)
                 superclass()
             }
-            resolver?.invokeQuietly(generateDirPath) ?: Logger.with(project).error(
+            resolver?.invokeQuietly(generateDirPath) ?: Logger.error(
                 "Project '${project.getFullName()}' source sets deployed failed, method \"srcDir\" maybe failed during the processing."
             )
-        }
+        } else Logger.debug("Source directory \"$generateDirPath\" already added to source set \"${config.sourceSetName}\", skipping.")
     }
 
     private fun decideSourceCodeType(config: GropifyConfig.CommonCodeGenerateConfig, type: ProjectType) = when (type) {
@@ -212,5 +218,17 @@ internal class SourceCodeDeployer(private val _config: () -> GropifyConfig) : De
             ?: "Undefined"
 
         return "${className.upperCamelcase()}Properties"
+    }
+
+    private fun isEnabled(config: GropifyConfig.SourceCodeGenerateConfig): Boolean {
+        if (!config.isEnabled) Logger.debug("Config ${
+            when (config){
+                is GropifyConfig.AndroidGenerateConfig -> "android"
+                is GropifyConfig.JvmGenerateConfig -> "jvm"
+                is GropifyConfig.KmpGenerateConfig -> "kmp"
+                else -> "unknown"
+            }
+        } is disabled in ${config.name}, skipping deployment process.")
+        return config.isEnabled
     }
 }

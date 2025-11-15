@@ -21,8 +21,9 @@
  */
 package com.highcapable.gropify.plugin
 
+import com.highcapable.gropify.debug.Logger
+import com.highcapable.gropify.debug.require
 import com.highcapable.gropify.gradle.api.entity.ProjectDescriptor
-import com.highcapable.gropify.internal.require
 import com.highcapable.gropify.plugin.config.proxy.GropifyConfig
 import com.highcapable.gropify.plugin.config.type.GropifyLocation
 import com.highcapable.gropify.plugin.deployer.BuildscriptDeployer
@@ -69,10 +70,11 @@ internal object DefaultDeployer {
      */
     fun init(settings: Settings, config: GropifyConfig) {
         DefaultDeployer.config = config
-        if (!config.isEnabled) return
+        if (!isEnabled()) return
 
         checkingConfigModified(settings)
 
+        Logger.debug("Initializing deployers, config modified: $configModified")
         deployers.forEach { it.init(settings, configModified) }
     }
 
@@ -81,8 +83,9 @@ internal object DefaultDeployer {
      * @param rootProject the current root project.
      */
     fun resolve(rootProject: Project) {
-        if (!config.isEnabled) return
+        if (!isEnabled()) return
 
+        Logger.debug("Resolving deployers, config modified: $configModified")
         deployers.forEach { it.resolve(rootProject, configModified) }
     }
 
@@ -91,8 +94,9 @@ internal object DefaultDeployer {
      * @param rootProject the current root project.
      */
     fun deploy(rootProject: Project) {
-        if (!config.isEnabled) return
+        if (!isEnabled()) return
 
+        Logger.debug("Deploying deployers, config modified: $configModified")
         deployers.forEach { it.deploy(rootProject, configModified) }
     }
 
@@ -106,16 +110,41 @@ internal object DefaultDeployer {
         val properties = mutableMapOf<String, PropertyTypeValue>()
         val resolveProperties = mutableMapOf<Any?, Any?>()
 
+        val locations = mutableMapOf<String, String>()
+
         config.permanentKeyValues.forEach { (key, value) ->
             properties[key] = value.createTypeValueByType(config.useTypeAutoConversion, key)
+            locations[key] = "Permanent Key-Value"
         }
         config.locations.forEach { location ->
             when (location) {
-                GropifyLocation.CurrentProject -> createProperties(config, descriptor.currentDir).forEach { resolveProperties.putAll(it) }
-                GropifyLocation.RootProject -> createProperties(config, descriptor.rootDir).forEach { resolveProperties.putAll(it) }
-                GropifyLocation.Global -> createProperties(config, descriptor.homeDir).forEach { resolveProperties.putAll(it) }
-                GropifyLocation.System -> resolveProperties.putAll(System.getProperties())
-                GropifyLocation.SystemEnv -> resolveProperties.putAll(System.getenv())
+                GropifyLocation.CurrentProject -> createProperties(config, descriptor.currentDir).forEach {
+                    resolveProperties.putAll(it)
+
+                    it.forEach { (key, _) -> locations[key.toString()] = location.name }
+                }
+                GropifyLocation.RootProject -> createProperties(config, descriptor.rootDir).forEach {
+                    resolveProperties.putAll(it)
+
+                    it.forEach { (key, _) -> locations[key.toString()] = location.name }
+                }
+                GropifyLocation.Global -> createProperties(config, descriptor.homeDir).forEach {
+                    resolveProperties.putAll(it)
+
+                    it.forEach { (key, _) -> locations[key.toString()] = location.name }
+                }
+                GropifyLocation.System -> {
+                    val system = System.getProperties()
+                    resolveProperties.putAll(system)
+
+                    system.forEach { (key, _) -> locations[key.toString()] = location.name }
+                }
+                GropifyLocation.SystemEnv -> {
+                    val systemEnv = System.getenv()
+                    resolveProperties.putAll(systemEnv)
+
+                    systemEnv.forEach { (key, _) -> locations[key] = location.name }
+                }
             }
         }
 
@@ -167,6 +196,7 @@ internal object DefaultDeployer {
         // Replace all key-values if exists.
         config.replacementKeyValues.forEach { (key, value) ->
             properties[key] = value.createTypeValueByType(config.useTypeAutoConversion, key)
+            locations[key] = "Replacement Key-Value${locations[key]?.let { ", $it" }}"
         }
 
         // Apply key-values rules.
@@ -175,6 +205,23 @@ internal object DefaultDeployer {
 
             val resolveValue = mapper(value.raw).createTypeValue(config.useTypeAutoConversion, key, type)
             properties[key] = resolveValue
+
+            locations[key] = "Rule-based Key-Value${locations[key]?.let { ", $it" }}"
+        }
+
+        properties.forEach { (key, value) ->
+            Logger.debug(
+                """
+                  Generated property for ${config.name}
+                  ----------
+                  [Key]: $key
+                  [Value]: ${value.raw}
+                  [Code Value]: ${value.codeValue}
+                  [Type]: ${value.type.simpleName}
+                  [Location]: ${locations[key] ?: "Unknown"}
+                  ----------
+                """.trimIndent()
+            )
         }
 
         return properties
@@ -199,5 +246,10 @@ internal object DefaultDeployer {
             configModified = gradleHashCode == -1 || lastModifiedHashCode != gradleHashCode
             lastModifiedHashCode = gradleHashCode
         }
+    }
+
+    private fun isEnabled(): Boolean {
+        if (!config.isEnabled) Logger.debug("Gropify is disabled, skipping deployment process.")
+        return config.isEnabled
     }
 }

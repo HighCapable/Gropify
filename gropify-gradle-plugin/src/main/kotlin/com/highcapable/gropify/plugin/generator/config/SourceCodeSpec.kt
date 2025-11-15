@@ -21,7 +21,7 @@
  */
 package com.highcapable.gropify.plugin.generator.config
 
-import com.highcapable.gropify.internal.error
+import com.highcapable.gropify.debug.error
 import com.highcapable.gropify.plugin.Gropify
 import com.palantir.javapoet.JavaFile
 import com.squareup.kotlinpoet.FileSpec

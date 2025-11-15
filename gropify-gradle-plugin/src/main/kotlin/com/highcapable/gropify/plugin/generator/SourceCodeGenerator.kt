@@ -21,9 +21,11 @@
  */
 package com.highcapable.gropify.plugin.generator
 
-import com.highcapable.gropify.internal.require
+import com.highcapable.gropify.debug.Logger
+import com.highcapable.gropify.debug.require
 import com.highcapable.gropify.plugin.Gropify
 import com.highcapable.gropify.plugin.config.proxy.GropifyConfig
+import com.highcapable.gropify.plugin.deployer.extension.ProjectType
 import com.highcapable.gropify.plugin.generator.config.GenerateConfig
 import com.highcapable.gropify.plugin.generator.config.SourceCodeSpec
 import com.highcapable.gropify.plugin.generator.extension.PropertyMap
@@ -38,16 +40,33 @@ internal class SourceCodeGenerator {
 
     /**
      * Build source code specs.
+     * @param projectType the project type.
      * @param config the current generate config.
      * @param generateConfig the generate config.
      * @param keyValues the properties' key-values map.
      * @return [List]<[SourceCodeSpec]>
      */
-    fun build(config: GropifyConfig.SourceCodeGenerateConfig, generateConfig: GenerateConfig, keyValues: PropertyMap): List<SourceCodeSpec> {
+    fun build(
+        projectType: ProjectType,
+        config: GropifyConfig.SourceCodeGenerateConfig,
+        generateConfig: GenerateConfig,
+        keyValues: PropertyMap
+    ): List<SourceCodeSpec> {
         Gropify.require(config is GropifyConfig.CommonCodeGenerateConfig) {
             "Only Android, Jvm, Kotlin Multiplatform project is supported for now."
         }
 
+        Logger.debug(
+            """
+              Generated source for ${config.name}
+              ----------
+              [Class]: ${generateConfig.packageName}.${generateConfig.className}
+              [Project Type]: $projectType
+              [Source Set]: ${config.sourceSetName}
+              [Generate Dir]: ${config.generateDirPath}
+              ----------
+            """.trimIndent()
+        )
         return listOf(
             java.build(config, generateConfig, keyValues),
             kotlin.build(config, generateConfig, keyValues)

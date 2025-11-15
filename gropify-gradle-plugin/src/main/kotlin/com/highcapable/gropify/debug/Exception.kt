@@ -21,7 +21,7 @@
  */
 @file:Suppress("UnusedReceiverParameter")
 
-package com.highcapable.gropify.internal
+package com.highcapable.gropify.debug
 
 import com.highcapable.gropify.plugin.Gropify
 import kotlin.contracts.ExperimentalContracts

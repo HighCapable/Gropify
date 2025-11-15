@@ -21,7 +21,7 @@
  */
 package com.highcapable.gropify.gradle.api.extension
 
-import com.highcapable.gropify.internal.error
+import com.highcapable.gropify.debug.error
 import com.highcapable.gropify.plugin.Gropify
 import com.highcapable.gropify.utils.extension.camelcase
 import com.highcapable.kavaref.extension.classOf

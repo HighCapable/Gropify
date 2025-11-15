@@ -21,10 +21,10 @@
  */
 package com.highcapable.gropify.plugin.helper
 
+import com.highcapable.gropify.debug.Logger
 import com.highcapable.gropify.gradle.api.extension.getFullName
 import com.highcapable.gropify.gradle.api.extension.getOrNull
 import com.highcapable.gropify.gradle.api.extension.hasExtension
-import com.highcapable.gropify.internal.Logger
 import com.highcapable.gropify.plugin.deployer.extension.ExtensionName
 import com.highcapable.gropify.plugin.extension.dsl.configure.GropifyConfigureExtension
 import com.highcapable.kavaref.KavaRef.Companion.asResolver
@@ -73,7 +73,7 @@ internal object AndroidProjectHelper {
         }.onFailure {
             // If file broken, reset it.
             namespacesFile.writeText("{}")
-            Logger.with(this).warn("Android project namespaces file was broken and has been reset.")
+            Logger.warn("Android project namespaces file was broken and has been reset.")
         }.getOrDefault(hashMapOf())
 
         val namespace = getExtensionNamespace()

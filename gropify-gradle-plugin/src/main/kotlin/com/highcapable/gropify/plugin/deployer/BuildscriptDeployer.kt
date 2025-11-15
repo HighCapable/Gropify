@@ -25,7 +25,9 @@ import com.highcapable.gropify.gradle.api.entity.Dependency
 import com.highcapable.gropify.gradle.api.entity.ProjectDescriptor
 import com.highcapable.gropify.gradle.api.extension.addDependencyToBuildscript
 import com.highcapable.gropify.gradle.api.extension.getOrCreate
+import com.highcapable.gropify.gradle.api.extension.hasExtension
 import com.highcapable.gropify.gradle.api.extension.toClassOrNull
+import com.highcapable.gropify.debug.Logger
 import com.highcapable.gropify.plugin.DefaultDeployer
 import com.highcapable.gropify.plugin.Gropify
 import com.highcapable.gropify.plugin.compiler.extension.compile
@@ -82,7 +84,7 @@ internal class BuildscriptDeployer(private val _config: () -> GropifyConfig) : D
         ) return
 
         cachedSettingsProperties = allProperties
-        buildscriptGenerator.build(config, allConfig, allProperties).compile(
+        buildscriptGenerator.build(allConfig, allProperties).compile(
             buildscriptAccessorsDependency,
             buildscriptAccessorsDir.absolutePath,
             buildscriptGenerator.compileStubFiles
@@ -90,14 +92,16 @@ internal class BuildscriptDeployer(private val _config: () -> GropifyConfig) : D
     }
 
     override fun resolve(rootProject: Project, configModified: Boolean) {
-        if (!buildscriptAccessorsDir.resolve(buildscriptAccessorsDependency.relativePath).isEmpty())
-            rootProject.addDependencyToBuildscript(buildscriptAccessorsDir.absolutePath, buildscriptAccessorsDependency)
+        if (buildscriptAccessorsDir.resolve(buildscriptAccessorsDependency.relativePath).isEmpty()) return
+
+        Logger.debug("Resolving classpath for $buildscriptAccessorsDependency")
+        rootProject.addDependencyToBuildscript(buildscriptAccessorsDir.absolutePath, buildscriptAccessorsDependency)
     }
 
     override fun deploy(rootProject: Project, configModified: Boolean) {
         fun Project.deploy() {
             val config = config.from(this).buildscript
-            if (!config.isEnabled) return
+            if (!isEnabled(config)) return
 
             val className = buildscriptGenerator.propertiesClass(config.name)
             val accessorsClass = className.toClassOrNull(this) ?: throw RuntimeException(
@@ -108,7 +112,13 @@ internal class BuildscriptDeployer(private val _config: () -> GropifyConfig) : D
                 """.trimIndent()
             )
 
-            getOrCreate(config.extensionName.camelcase(), accessorsClass)
+            val extensionName = config.extensionName.camelcase()
+
+            getOrCreate(extensionName, accessorsClass)
+
+            if (hasExtension(extensionName))
+                Logger.debug("Created buildscript extension \"$extensionName\" for $this")
+            else Logger.warn("Failed to create buildscript extension \"$extensionName\" for $this")
         }
 
         rootProject.deploy()
@@ -120,4 +130,9 @@ internal class BuildscriptDeployer(private val _config: () -> GropifyConfig) : D
             .resolve(GropifyConfigureExtension.NAME)
             .resolve(GropifyConfig.ARTIFACTS_NAME)
             .apply { mkdirs() }
+
+    private fun isEnabled(config: GropifyConfig.BuildscriptGenerateConfig): Boolean {
+        if (!config.isEnabled) Logger.debug("Config buildscript is disabled in ${config.name}, skipping deployment process.")
+        return config.isEnabled
+    }
 }

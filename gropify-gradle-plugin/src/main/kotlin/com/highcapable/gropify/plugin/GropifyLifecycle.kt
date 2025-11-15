@@ -21,10 +21,11 @@
  */
 package com.highcapable.gropify.plugin
 
+import com.highcapable.gropify.debug.Logger
+import com.highcapable.gropify.debug.error
 import com.highcapable.gropify.gradle.api.GradleDescriptor
 import com.highcapable.gropify.gradle.api.extension.getOrCreate
 import com.highcapable.gropify.gradle.api.plugin.PluginLifecycle
-import com.highcapable.gropify.internal.error
 import com.highcapable.gropify.plugin.extension.dsl.configure.GropifyConfigureExtension
 import org.gradle.api.Project
 import org.gradle.api.initialization.Settings
@@ -45,14 +46,22 @@ internal class GropifyLifecycle : PluginLifecycle {
     override fun onSettingsEvaluated(settings: Settings) {
         val config = configure?.build(settings) ?: Gropify.error("Extension \"${GropifyConfigureExtension.NAME}\" create failed.")
 
+        Logger.debugMode = config.debugMode
+        Logger.debug("Gropify ${Gropify.VERSION} running on Gradle ${GradleDescriptor.version}")
+        Logger.debug("Loaded configuration.")
+
         DefaultDeployer.init(settings, config)
     }
 
     override fun beforeProjectEvaluate(rootProject: Project) {
+        Logger.debug("Before project evaluate: $rootProject")
+
         DefaultDeployer.resolve(rootProject)
     }
 
     override fun afterProjectEvaluate(rootProject: Project) {
+        Logger.debug("After project evaluate: $rootProject")
+
         DefaultDeployer.deploy(rootProject)
     }
 }

@@ -23,8 +23,8 @@
 
 package com.highcapable.gropify.plugin
 
-import com.highcapable.gropify.internal.Logger
-import com.highcapable.gropify.internal.error
+import com.highcapable.gropify.debug.Logger
+import com.highcapable.gropify.debug.error
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.initialization.Settings
@@ -56,7 +56,7 @@ class GropifyPlugin<T : ExtensionAware> internal constructor() : Plugin<T> {
                 }
             }
         }
-        is Project -> Logger.with(target).error(
+        is Project -> Logger.error(
             "Gropify can only applied in settings.gradle or settings.gradle.kts, but current is $target, stop loading.",
         )
         else -> Gropify.error("Gropify applied to an unknown target: $target, stop loading.")

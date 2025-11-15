@@ -21,8 +21,8 @@
  */
 package com.highcapable.gropify.gradle.api.entity
 
+import com.highcapable.gropify.debug.error
 import com.highcapable.gropify.gradle.api.extension.getFullName
-import com.highcapable.gropify.internal.error
 import com.highcapable.gropify.plugin.Gropify
 import org.gradle.api.Project
 import org.gradle.api.initialization.Settings

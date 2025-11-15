@@ -21,7 +21,7 @@
  */
 package com.highcapable.gropify.plugin.generator
 
-import com.highcapable.gropify.internal.error
+import com.highcapable.gropify.debug.error
 import com.highcapable.gropify.plugin.Gropify
 import com.highcapable.gropify.plugin.config.proxy.GropifyConfig
 import com.highcapable.gropify.plugin.generator.config.GenerateConfig

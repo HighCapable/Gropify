@@ -21,10 +21,10 @@
  */
 package com.highcapable.gropify.plugin.generator
 
+import com.highcapable.gropify.debug.Logger
+import com.highcapable.gropify.debug.error
+import com.highcapable.gropify.debug.require
 import com.highcapable.gropify.gradle.api.GradleDescriptor
-import com.highcapable.gropify.internal.Logger
-import com.highcapable.gropify.internal.error
-import com.highcapable.gropify.internal.require
 import com.highcapable.gropify.plugin.Gropify
 import com.highcapable.gropify.plugin.config.proxy.GropifyConfig
 import com.highcapable.gropify.plugin.extension.accessors.proxy.ExtensionAccessors
@@ -293,7 +293,6 @@ internal class BuildscriptGenerator {
      * - Note: [allConfig] and [allKeyValues] must be equal in number.
      */
     fun build(
-        config: GropifyConfig,
         allConfig: MutableList<GropifyConfig.BuildscriptGenerateConfig>,
         allKeyValues: MutableList<PropertyMap>
     ) = runCatching {
@@ -303,7 +302,7 @@ internal class BuildscriptGenerator {
 
         val files = mutableListOf<JavaFile>()
         if (allConfig.isEmpty()) return@runCatching let {
-            if (config.debugMode) Logger.get().debug("No buildscript accessors classes to generate.")
+            Logger.debug("No buildscript accessors classes to generate.")
             files
         }
 
@@ -322,12 +321,7 @@ internal class BuildscriptGenerator {
             files.add(buildTypeSpec().createJavaFile(ACCESSORS_PACKAGE_NAME))
         }
 
-        if (config.debugMode) files.forEach {
-            Logger.get().debug(
-                "Generated buildscript accessors class: ${it.typeSpec().name()}\n" +
-                    "====== BEGIN FILE CONTENT ======\n$it\n====== END FILE CONTENT ======"
-            )
-        }
+        Logger.debug("Generated buildscript accessors classes: [${files.joinToString { it.typeSpec().name() }}]")
 
         files
     }.getOrElse { Gropify.error("Failed to generated accessors classes.\n${it.stackTraceToString()}") }

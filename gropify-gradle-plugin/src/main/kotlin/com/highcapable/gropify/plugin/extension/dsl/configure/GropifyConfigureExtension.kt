@@ -23,9 +23,9 @@
 
 package com.highcapable.gropify.plugin.extension.dsl.configure
 
+import com.highcapable.gropify.debug.error
+import com.highcapable.gropify.debug.require
 import com.highcapable.gropify.gradle.api.extension.isUnSafeExtName
-import com.highcapable.gropify.internal.error
-import com.highcapable.gropify.internal.require
 import com.highcapable.gropify.plugin.Gropify
 import com.highcapable.gropify.plugin.config.extension.create
 import com.highcapable.gropify.plugin.config.proxy.GropifyConfig
@@ -67,6 +67,10 @@ open class GropifyConfigureExtension internal constructor() {
      *
      * You can help us identify the problem by enabling this option
      * to print more debugging information in the logs.
+     *
+     * - Note: THIS IS ONLY FOR DEBUGGING!
+     *   The debug log will contain your local environment,
+     *   which may contain sensitive information. Please be sure to protect this information.
      */
     var debugMode = false
         @JvmName("debugMode") set
@@ -108,6 +112,17 @@ open class GropifyConfigureExtension internal constructor() {
             level = DeprecationLevel.ERROR
         )
         val isEnabled: Boolean get() = Gropify.error("No getter available.")
+
+        /**
+         * Please call it from top level [GropifyConfigureExtension].
+         * @throws IllegalStateException
+         */
+        @Suppress("unused")
+        @Deprecated(
+            message = "Please call it from top level `GropifyConfigureExtension`.",
+            level = DeprecationLevel.ERROR
+        )
+        val debugMode: Boolean get() = Gropify.error("No getter available.")
 
         /**
          * Configure common.
