@@ -21,13 +21,13 @@
  */
 package com.highcapable.gropify.plugin.deployer
 
+import com.highcapable.gropify.debug.Logger
 import com.highcapable.gropify.gradle.api.entity.Dependency
 import com.highcapable.gropify.gradle.api.entity.ProjectDescriptor
 import com.highcapable.gropify.gradle.api.extension.addDependencyToBuildscript
 import com.highcapable.gropify.gradle.api.extension.getOrCreate
 import com.highcapable.gropify.gradle.api.extension.hasExtension
 import com.highcapable.gropify.gradle.api.extension.toClassOrNull
-import com.highcapable.gropify.debug.Logger
 import com.highcapable.gropify.plugin.DefaultDeployer
 import com.highcapable.gropify.plugin.Gropify
 import com.highcapable.gropify.plugin.compiler.extension.compile
