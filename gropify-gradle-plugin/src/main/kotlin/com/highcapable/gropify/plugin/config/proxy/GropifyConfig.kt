@@ -85,7 +85,11 @@ internal interface GropifyConfig {
     /**
      * Android project generate configuration interface.
      */
-    interface AndroidGenerateConfig : JvmGenerateConfig
+    interface AndroidGenerateConfig : JvmGenerateConfig {
+
+        /** Whether to use manifest placeholders' generation. */
+        val manifestPlaceholders: Boolean
+    }
 
     /**
      * Jvm project generate configuration interface.

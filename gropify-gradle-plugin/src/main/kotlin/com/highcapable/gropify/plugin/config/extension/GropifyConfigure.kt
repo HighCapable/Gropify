@@ -186,6 +186,11 @@ private fun GropifyConfigureExtension.AndroidGenerateConfigureScope.create(
             ?: global?.isIsolationEnabled
             ?: DefaultConfig.createAndroidGenerateConfig(name, selfCommon, globalCommon).isIsolationEnabled
 
+    override val manifestPlaceholders
+        get() = this@create.manifestPlaceholders
+            ?: global?.manifestPlaceholders
+            ?: DefaultConfig.createAndroidGenerateConfig(name, selfCommon, globalCommon).manifestPlaceholders
+
     override val existsPropertyFiles
         get() = this@create.existsPropertyFiles
             ?: global?.existsPropertyFiles

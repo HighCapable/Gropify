@@ -173,7 +173,17 @@ open class GropifyConfigureExtension internal constructor() {
             @JvmName("extensionName") set
     }
 
-    open inner class AndroidGenerateConfigureScope internal constructor() : JvmGenerateConfigureScope()
+    open inner class AndroidGenerateConfigureScope internal constructor() : JvmGenerateConfigureScope() {
+
+        /**
+         * Whether to use manifest placeholders' generation.
+         *
+         * Disabled by default, when enabled will synchronize the properties' key-values
+         * to the `manifestPlaceholders` in the `android` configuration method block.
+         */
+        var manifestPlaceholders: Boolean? = null
+            @JvmName("manifestPlaceholders") set
+    }
 
     open inner class JvmGenerateConfigureScope internal constructor() : CommonCodeGenerateConfigureScope() {
 

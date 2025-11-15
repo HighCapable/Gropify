@@ -91,7 +91,7 @@ internal class SourceCodeDeployer(private val _config: () -> GropifyConfig) : De
             val properties = generateMap(config, ProjectDescriptor.create(project = this))
 
             if (!configModified && properties == cachedProjectProperties[getFullName()] && !outputDir.isEmpty()) {
-                if (config.isEnabled) configureSourceSets(project = this)
+                if (config.isEnabled) configureSourceSets(project = this, properties)
                 return
             }
 
@@ -110,7 +110,7 @@ internal class SourceCodeDeployer(private val _config: () -> GropifyConfig) : De
             sourceCodeGenerator.build(projectType, config, generateConfig, properties).let { generator ->
                 generator.first { it.type == sourceCodeType }
             }.writeTo(outputDir)
-            configureSourceSets(project = this)
+            configureSourceSets(project = this, properties)
         }
 
         rootProject.generate()
@@ -121,7 +121,7 @@ internal class SourceCodeDeployer(private val _config: () -> GropifyConfig) : De
         }
     }
 
-    private fun configureSourceSets(project: Project) {
+    private fun configureSourceSets(project: Project, properties: PropertyMap) {
         val projectType = project.resolveType()
 
         val config = config.from(project).let {
@@ -189,6 +189,24 @@ internal class SourceCodeDeployer(private val _config: () -> GropifyConfig) : De
                 "Project '${project.getFullName()}' source sets deployed failed, method \"srcDir\" maybe failed during the processing."
             )
         } else Logger.debug("Source directory \"$generateDirPath\" already added to source set \"${config.sourceSetName}\", skipping.")
+
+        if (projectType == ProjectType.Android && 
+            config is GropifyConfig.AndroidGenerateConfig && 
+            config.manifestPlaceholders
+        ) {
+            Logger.debug("Deploying to manifestPlaceholders.")
+
+            val defaultConfig = extension.asResolver().optional(!debugMode).firstMethodOrNull {
+                name = "getDefaultConfig"
+                emptyParameters()
+            }?.invokeQuietly()
+
+            defaultConfig?.asResolver()?.optional(!debugMode)?.firstMethodOrNull {
+                name = "addManifestPlaceholders"
+                parameters(Map::class)
+                superclass()
+            }?.invokeQuietly(properties.map { (key, value) -> key to value.raw }.toMap())
+        }
     }
 
     private fun decideSourceCodeType(config: GropifyConfig.CommonCodeGenerateConfig, type: ProjectType) = when (type) {

@@ -126,6 +126,8 @@ internal object DefaultConfig {
 
         override val isIsolationEnabled get() = true
 
+        override val manifestPlaceholders get() = false
+
         override val isEnabled
             get() = selfCommon?.isEnabled
                 ?: globalCommon?.isEnabled
