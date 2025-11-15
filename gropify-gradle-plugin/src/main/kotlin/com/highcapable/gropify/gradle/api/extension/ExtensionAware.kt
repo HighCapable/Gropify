@@ -126,7 +126,14 @@ internal fun Any.asExtension() = this as? ExtensionAware? ?: Gropify.error("This
  * @receiver [String]
  * @return [Boolean]
  */
-internal fun String.isUnSafeExtName() = camelcase().let { it == "ext" || it == "extra" || it == "extraProperties" || it == "extensions" }
+internal fun String.isUnSafeExtName() = camelcase().let {
+    it == "ext" ||
+        it == "extra" ||
+        it == "extraProperties" ||
+        it == "extensions" ||
+        it == "libs" ||
+        it == "versionCatalogs"
+}
 
 /**
  * Since Gradle has an [ExtensionAware] extension,
