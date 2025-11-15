@@ -27,8 +27,8 @@ import com.highcapable.gropify.plugin.config.proxy.GropifyConfig
 import com.highcapable.gropify.plugin.generator.config.GenerateConfig
 import com.highcapable.gropify.plugin.generator.config.SourceCodeSpec
 import com.highcapable.gropify.plugin.generator.extension.PropertyMap
+import com.highcapable.gropify.plugin.generator.extension.escapeForKotlinPoet
 import com.highcapable.gropify.plugin.generator.extension.toOptimize
-import com.highcapable.gropify.plugin.generator.extension.toPoetGenerationContent
 import com.highcapable.gropify.plugin.generator.extension.toUnderscores
 import com.highcapable.gropify.utils.extension.firstNumberToLetter
 import com.squareup.kotlinpoet.FileSpec
@@ -72,7 +72,7 @@ internal class KotlinCodeGenerator {
 
                         if (config.isRestrictedAccessEnabled) addModifiers(KModifier.INTERNAL)
                         addModifiers(KModifier.CONST)
-                        initializer(currentValue.codeValue.toPoetGenerationContent())
+                        initializer(currentValue.codeValue.escapeForKotlinPoet())
                     }.build())
                 }
             }.build())

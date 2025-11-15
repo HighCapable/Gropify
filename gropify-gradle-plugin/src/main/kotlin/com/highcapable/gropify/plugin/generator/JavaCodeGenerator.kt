@@ -27,8 +27,8 @@ import com.highcapable.gropify.plugin.config.proxy.GropifyConfig
 import com.highcapable.gropify.plugin.generator.config.GenerateConfig
 import com.highcapable.gropify.plugin.generator.config.SourceCodeSpec
 import com.highcapable.gropify.plugin.generator.extension.PropertyMap
+import com.highcapable.gropify.plugin.generator.extension.escapeForJavaPoet
 import com.highcapable.gropify.plugin.generator.extension.toOptimize
-import com.highcapable.gropify.plugin.generator.extension.toPoetGenerationContent
 import com.highcapable.gropify.plugin.generator.extension.toUnderscores
 import com.highcapable.gropify.utils.extension.firstNumberToLetter
 import com.palantir.javapoet.ClassName
@@ -71,7 +71,7 @@ internal class JavaCodeGenerator {
                             addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
                         else addModifiers(Modifier.STATIC, Modifier.FINAL)
 
-                        initializer(currentValue.codeValue.toPoetGenerationContent())
+                        initializer(currentValue.codeValue.escapeForJavaPoet())
                     }.build()
                 )
             }
