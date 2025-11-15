@@ -546,7 +546,7 @@ open class GropifyConfigureExtension internal constructor() {
      */
     internal fun build(settings: Settings): GropifyConfig {
         fun String.checkingStartWithLetter(description: String) {
-            Gropify.require(isStartsWithLetter()) {
+            Gropify.require(isBlank() || isStartsWithLetter()) {
                 "$description name \"$this\" must start with a letter."
             }
         }
