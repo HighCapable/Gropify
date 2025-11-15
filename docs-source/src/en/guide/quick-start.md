@@ -74,8 +74,19 @@ If you don't want to use Kotlin DSL entirely, you can also migrate only `setting
 
 ```kotlin
 gropify {
-    // Enable Gropify, setting it to `false` will disable all features
+    // Enable Gropify, setting it to `false` will disable all features.
     isEnabled = true
+
+    // Whether to enable debug mode.
+    //
+    // You can help us identify the problem by enabling this option
+    // to print more debugging information in the logs.
+    //
+    // - Note: THIS IS ONLY FOR DEBUGGING!
+    //   The debug log will contain your local environment,
+    //   which may contain sensitive information.
+    //   Please be sure to protect this information.
+    debugMode = false
 }
 ```
 
