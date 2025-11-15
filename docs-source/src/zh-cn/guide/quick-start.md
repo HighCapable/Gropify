@@ -418,6 +418,11 @@ android {
     // - 注意: 如果你禁用此选项，请确保没有其他同样使用或不仅使用
     //   Gropify 生成代码的项目，以避免冲突
     isIsolationEnabled = true
+
+    // 是否使用清单占位符的生成。
+    // 
+    // 默认禁用，启用后将同步属性的键值到 `android` 配置方法块中的 `manifestPlaceholders`
+    manifestPlaceholders = false
 }
 ```
 
@@ -605,6 +610,7 @@ var version = GropifyDemoProperties.PROJECT_VERSION;
 
 ```properties
 project.namespace=com.highcapable.gropifydemo
+project.appName=Gropify Demo
 project.compileSdk=36
 project.targetSdk=36
 project.minSdk=26
@@ -626,6 +632,24 @@ android {
         targetSdk = gropify.project.targetSdk
     }
 }
+```
+
+当你设置了 `manifestPlaceholders = true` 时，`Gropify` 将自动将这些属性键值同步到 `android` 配置方法块中的 `manifestPlaceholders`。
+
+此时你可以直接在 `AndroidManifest.xml` 中使用这些占位符。
+
+> 示例如下
+
+```xml
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application
+        android:label="${project.appName}"
+        android:icon="@mipmap/ic_launcher">
+
+        ...
+    </application>
+</manifest>
 ```
 
 你可以无需再使用 `buildConfigField` 向 `BuildConfig` 添加代码，有了 `Gropify` 生成的属性键值代码，你可以更加灵活地管理你的项目。
