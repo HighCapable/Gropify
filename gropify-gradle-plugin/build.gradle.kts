@@ -15,9 +15,6 @@ java {
 
 kotlin {
     jvmToolchain(17)
-
-    sourceSets.all { languageSettings { languageVersion = "2.0" } }
-
     compilerOptions {
         freeCompilerArgs = listOf(
             "-Xno-param-assertions",
