@@ -26,8 +26,11 @@ kotlin {
 
 dependencies {
     implementation(libs.jackson.module.kotlin)
+
+    implementation(platform(libs.kavaref.bom))
     implementation(libs.kavaref.core)
     implementation(libs.kavaref.extension)
+
     implementation(libs.kotlinpoet)
     implementation(libs.javapoet)
     implementation(libs.zip4j)
