@@ -43,7 +43,7 @@ internal class ProjectDescriptor private constructor() {
          * @return [ProjectDescriptor]
          */
         fun create(settings: Settings, name: String = "") = ProjectDescriptor().also {
-            val isRootProject = name.isBlank() || name.lowercase() == settings.rootProject.name.lowercase()
+            val isRootProject = name.isBlank() || name.equals(settings.rootProject.name, ignoreCase = true)
             val subProjectNotice = "if this is a sub-project, please set it like \":$name\""
 
             it.type = Type.Settings

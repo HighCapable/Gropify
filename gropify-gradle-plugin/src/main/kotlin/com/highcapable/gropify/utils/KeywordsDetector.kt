@@ -22,7 +22,7 @@
 package com.highcapable.gropify.utils
 
 /**
- * Java keywords detector.
+ * Java keywords' detector.
  */
 internal object KeywordsDetector {
 
@@ -35,7 +35,7 @@ internal object KeywordsDetector {
         "throw", "throws", "transient", "try", "void", "volatile", "while"
     )
 
-    private val invalidPattern = "^(\\d.*|.*[^A-Za-z0-9_\$].*)$".toRegex()
+    private val invalidPattern = "^(\\d.*|.*[^A-Za-z0-9_$].*)$".toRegex()
 
     /**
      * Verify if the name is a valid Java package name.

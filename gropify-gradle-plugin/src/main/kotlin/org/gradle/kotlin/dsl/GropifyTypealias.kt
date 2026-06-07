@@ -23,7 +23,9 @@
 
 package org.gradle.kotlin.dsl
 
+import com.highcapable.gropify.plugin.config.type.GropifyLocation as _GropifyLocation
+
 /**
- * Typealias for [com.highcapable.gropify.plugin.config.type.GropifyLocation].
+ * Typealias for [_GropifyLocation].
  */
-typealias GropifyLocation = com.highcapable.gropify.plugin.config.type.GropifyLocation
+typealias GropifyLocation = _GropifyLocation

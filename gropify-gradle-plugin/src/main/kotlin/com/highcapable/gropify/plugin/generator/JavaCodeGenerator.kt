@@ -65,7 +65,7 @@ internal class JavaCodeGenerator {
 
                 addField(
                     FieldSpec.builder(currentValue.type.java, key.firstNumberToLetter()).apply {
-                        addJavadoc("Resolve the \$S value \$S.", currentKey, currentValue.raw)
+                        addJavadoc($$"Resolve the $S value $S.", currentKey, currentValue.raw)
 
                         if (!config.isRestrictedAccessEnabled)
                             addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)

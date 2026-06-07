@@ -136,7 +136,7 @@ internal fun String.calculateSha256() = MessageDigest.getInstance("SHA-256")
  * @receiver [String]
  * @return [Boolean]
  */
-internal fun String.hasInterpolation() = contains("\${") && contains("}")
+internal fun String.hasInterpolation() = contains($$"${") && contains("}")
 
 /**
  * Replace interpolation symbols `${...}` in a string.

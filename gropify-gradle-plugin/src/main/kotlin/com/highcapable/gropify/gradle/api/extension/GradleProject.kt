@@ -26,7 +26,6 @@ import com.highcapable.gropify.utils.extension.toFile
 import com.highcapable.kavaref.extension.toClassOrNull
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.buildscript
-import org.gradle.kotlin.dsl.repositories
 
 /**
  * Get the full name of the specified project.

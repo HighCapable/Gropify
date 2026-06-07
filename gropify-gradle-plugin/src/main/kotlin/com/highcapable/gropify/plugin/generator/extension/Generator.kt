@@ -70,14 +70,14 @@ internal fun PropertyOptimizeMap.toUnderscores(): PropertyOptimizeMap {
 }
 
 /**
- * Escape percentage signs for Javapoet code generation.
+ * Escape percentage signs for JavaPoet code generation.
  * @receiver [String]
  * @return [String]
  */
 internal fun String.escapeForJavaPoet() = replace("$", "$$")
 
 /**
- * Escape percentage signs and replace spaces to middle dot for Kotlinpoet code generation.
+ * Escape percentage signs and replace spaces to middle dot for KotlinPoet code generation.
  * @receiver [String]
  * @return [String]
  */
