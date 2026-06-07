@@ -24,7 +24,7 @@ First, configure the plugin repository in your project's `settings.gradle.kts`.
 pluginManagement {
     repositories {
         gradlePluginPortal() // Optional
-        google() // Optional
+        google() // Required
         mavenCentral() // Required
         // (Optional) You can add this URL to use our public repository
         // This repository is added as an alternative when Sonatype-OSS fails to publish dependencies
@@ -117,6 +117,11 @@ global {
         // Configure "buildscript".
     }
 
+    // Source code configuration.
+    sourceCode {
+        // Configure "sourceCode".
+    }
+
     // Android project configuration.
     android {
         // Configure "android".
@@ -142,6 +147,9 @@ rootProject {
     }
     buildscript {
         // Configure "buildscript".
+    }
+    sourceCode {
+        // Configure "sourceCode".
     }
     android {
         // Configure "android".
@@ -178,6 +186,9 @@ projects(":app", ":modules:library1", ":modules:library2") {
     buildscript {
         // Configure "buildscript".
     }
+    sourceCode {
+        // Configure "sourceCode".
+    }
     android {
         // Configure "android".
     }
@@ -194,7 +205,7 @@ You can continue below to learn how to configure the features in each method blo
 
 ### Common Configuration
 
-Here you can configure related features for all configuration types at the same time. The configurations here will be applied down to [Build Script Configuration](#build-script-configuration), [Android Project Configuration](#android-project-configuration), [JVM Project Configuration](#jvm-project-configuration), [Kotlin Multiplatform Project Configuration](#kotlin-multiplatform-project-configuration).
+Here you can configure related features for all configuration types at the same time. The configurations here will be applied down to [Build Script Configuration](#build-script-configuration), [Source Code Configuration](#source-code-configuration), [Android Project Configuration](#android-project-configuration), [JVM Project Configuration](#jvm-project-configuration), [Kotlin Multiplatform Project Configuration](#kotlin-multiplatform-project-configuration).
 
 > The following example
 
@@ -202,7 +213,7 @@ Here you can configure related features for all configuration types at the same 
 common {
     // Enable feature.
     //
-    // You can set [buildscript], [android], [jvm], [kmp] separately.
+    // You can set [buildscript], [sourceCode], [android], [jvm], [kmp] separately.
     isEnabled = true
 
     // Whether to exclude the non-string type key-values content.
@@ -375,11 +386,81 @@ Gradle also has a `buildscript` method block, please be careful to use the corre
 
 :::
 
+### Source Code Configuration
+
+The configuration here includes the configuration in `common`, and you can override it.
+
+The configuration here will be applied down to [Android Project Configuration](#android-project-configuration), [JVM Project Configuration](#jvm-project-configuration), [Kotlin Multiplatform Project Configuration](#kotlin-multiplatform-project-configuration), and you can continue to override it in the corresponding project type configuration method block.
+
+> The following example
+
+```kotlin
+sourceCode {
+    // Custom generated directory path.
+    //
+    // You can fill in the path relative to the current project.
+    //
+    // Format example: "path/to/your/src/main", the "src/main" is a fixed suffix.
+    //
+    // Default is "build/generated/gropify/src/main".
+    //
+    // We recommend that you set the generated path under the "build" directory,
+    // which is ignored by version control systems by default.
+    generateDirPath = "build/generated/gropify"
+
+    // Custom deployment `sourceSet` name.
+    //
+    // If your project source code deployment name is not default, you can customize it here.
+    //
+    // Android and JVM projects default is "main".
+    // Kotlin Multiplatform projects default is "commonMain".
+    sourceSetName = "main"
+
+    // Custom generated package name.
+    //
+    // Android projects use the `namespace` in the `android` configuration method block
+    // by default.
+    //
+    // Java, Kotlin or Kotlin Multiplatform projects use the `project.group` of the
+    // project settings by default.
+    //
+    // In a Kotlin Multiplatform project, if the AGP plugin is also applied,
+    // the `namespace` will still be used as the package name by default.
+    //
+    // The "generated" is a fixed suffix that avoids conflicts with your own namespaces,
+    // if you don't want this suffix, you can refer to [isIsolationEnabled].
+    packageName = "com.example.mydemo"
+
+    // Custom generated class name.
+    //
+    // Default is use the name of the current project.
+    //
+    // The "Properties" is a fixed suffix to distinguish it from your own class names.
+    className = "MyDemo"
+
+    // Whether to enable restricted access.
+    //
+    // Disabled by default, when enabled will add the `internal` modifier to
+    // generated Kotlin classes or remove the `public` modifier to generated Java classes.
+    isRestrictedAccessEnabled = false
+
+    // Whether to enable code isolation.
+    //
+    // Enabled by default, when enabled will generate code in an
+    // isolated package suffix "generated" to avoid conflicts with other projects that
+    // also use or not only Gropify to generate code.
+    //
+    // - Note: If you disable this option, please make sure that there are no other projects
+    //   that also use or not only Gropify to generate code to avoid conflicts.
+    isIsolationEnabled = true
+}
+```
+
 ### Android Project Configuration
 
 The content in this configuration block only takes effect for projects with AGP.
 
-The configuration here includes the configuration in `common`, and you can override it.
+The configuration here includes the configuration in `common` and `sourceCode`, and you can override it.
 
 > The following example
 
@@ -456,7 +537,7 @@ android {
 
 The content in this configuration block only takes effect for pure JVM projects (including Kotlin and Java projects). For Android projects, please refer to [Android Project Configuration](#android-project-configuration) for configuration.
 
-The configuration here includes the configuration in `common`, and you can override it.
+The configuration here includes the configuration in `common` and `sourceCode`, and you can override it.
 
 > The following example
 
@@ -526,7 +607,7 @@ jvm {
 
 The content in this configuration block only takes effect for projects with the Kotlin Multiplatform plugin.
 
-The configuration here includes the configuration in `common`, and you can override it.
+The configuration here includes the configuration in `common` and `sourceCode`, and you can override it.
 
 > The following example
 
