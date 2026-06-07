@@ -21,6 +21,8 @@
  */
 package com.highcapable.gropify.utils.extension
 
+import java.security.MessageDigest
+
 private val numericRegex = """^-?(\d+(\.\d+)?|\.\d+)$""".toRegex()
 
 /**
@@ -119,6 +121,15 @@ internal fun String.isNumeric() = numericRegex.matches(this)
 internal fun String.isStartsWithLetter() = firstOrNull()?.let {
     it in 'A'..'Z' || it in 'a'..'z'
 } == true
+
+/**
+ * Calculate the SHA-256 value of the string.
+ * @receiver [String]
+ * @return [String]
+ */
+internal fun String.calculateSha256() = MessageDigest.getInstance("SHA-256")
+    .digest(toByteArray())
+    .joinToString("") { "%02x".format(it) }
 
 /**
  * Whether the interpolation symbol `${...}` exists in the string.

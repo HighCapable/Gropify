@@ -30,15 +30,16 @@ import com.highcapable.gropify.gradle.api.extension.hasExtension
 import com.highcapable.gropify.gradle.api.extension.toClassOrNull
 import com.highcapable.gropify.plugin.DefaultDeployer
 import com.highcapable.gropify.plugin.Gropify
-import com.highcapable.gropify.plugin.compiler.extension.compile
+import com.highcapable.gropify.plugin.compiler.extension.toCompileSpec
 import com.highcapable.gropify.plugin.config.extension.from
 import com.highcapable.gropify.plugin.config.proxy.GropifyConfig
 import com.highcapable.gropify.plugin.deployer.proxy.Deployer
 import com.highcapable.gropify.plugin.extension.dsl.configure.GropifyConfigureExtension
 import com.highcapable.gropify.plugin.generator.BuildscriptGenerator
 import com.highcapable.gropify.plugin.generator.extension.PropertyMap
+import com.highcapable.gropify.plugin.repository.BuildscriptAccessorsRepository
+import com.highcapable.gropify.utils.extension.calculateSha256
 import com.highcapable.gropify.utils.extension.camelcase
-import com.highcapable.gropify.utils.extension.isEmpty
 import org.gradle.api.Project
 import org.gradle.api.initialization.Settings
 import java.io.File
@@ -51,15 +52,16 @@ internal class BuildscriptDeployer(private val _config: () -> GropifyConfig) : D
 
     private val config get() = _config()
 
-    private val buildscriptGenerator = BuildscriptGenerator()
+    private val generator = BuildscriptGenerator()
 
-    private var buildscriptAccessorsDir by Delegates.notNull<File>()
-    private val buildscriptAccessorsDependency = Dependency(Gropify.GROUP_NAME, GropifyConfig.ACCESSORS_NAME, Gropify.VERSION)
+    private var accessorsDir by Delegates.notNull<File>()
+    private val accessorsDependency = Dependency(Gropify.GROUP_NAME, GropifyConfig.ACCESSORS_NAME, Gropify.VERSION)
+    private val accessorsRepository get() = BuildscriptAccessorsRepository(accessorsDir, accessorsDependency)
 
     private var cachedSettingsProperties = mutableListOf<PropertyMap>()
 
     override fun init(settings: Settings, configModified: Boolean) {
-        buildscriptAccessorsDir = generatedBuildscriptAccessorsDir(settings)
+        accessorsDir = generatedBuildscriptAccessorsDir(settings)
 
         val allConfig = mutableListOf<GropifyConfig.BuildscriptGenerateConfig>()
         val allProperties = mutableListOf<PropertyMap>()
@@ -78,24 +80,38 @@ internal class BuildscriptDeployer(private val _config: () -> GropifyConfig) : D
             allConfig.add(subConfig.buildscript)
         }
 
-        if (!configModified &&
-            allProperties == cachedSettingsProperties &&
-            !buildscriptAccessorsDir.resolve(buildscriptAccessorsDependency.relativePath).isEmpty()
-        ) return
+        val compileSpec = generator.build(allConfig, allProperties)
+            .toCompileSpec(generator.compileStubFiles)
+        val expectedClassNames = allConfig.map { generator.propertiesClass(it.name) }
+        val fingerprint = createFingerprint(allConfig, allProperties)
+        val repository = accessorsRepository
 
-        cachedSettingsProperties = allProperties
-        buildscriptGenerator.build(allConfig, allProperties).compile(
-            buildscriptAccessorsDependency,
-            buildscriptAccessorsDir.absolutePath,
-            buildscriptGenerator.compileStubFiles
-        )
+        repository.withLock {
+            if (!configModified &&
+                allProperties == cachedSettingsProperties &&
+                repository.isReady(fingerprint, expectedClassNames)
+            ) return@withLock
+
+            if (repository.isReady(fingerprint, expectedClassNames)) {
+                cachedSettingsProperties = allProperties
+                return@withLock
+            }
+
+            cachedSettingsProperties = allProperties
+            repository.publish(compileSpec, fingerprint, expectedClassNames)
+        }
     }
 
     override fun resolve(rootProject: Project, configModified: Boolean) {
-        if (buildscriptAccessorsDir.resolve(buildscriptAccessorsDependency.relativePath).isEmpty()) return
+        var hasReadyBuildscriptAccessors = false
+        val repository = accessorsRepository
+        repository.withLock {
+            hasReadyBuildscriptAccessors = repository.isReady()
+        }
+        if (!hasReadyBuildscriptAccessors) return
 
-        Logger.debug("Resolving classpath for $buildscriptAccessorsDependency")
-        rootProject.addDependencyToBuildscript(buildscriptAccessorsDir.absolutePath, buildscriptAccessorsDependency)
+        Logger.debug("Resolving classpath for $accessorsDependency")
+        rootProject.addDependencyToBuildscript(accessorsDir.absolutePath, accessorsDependency)
     }
 
     override fun deploy(rootProject: Project, configModified: Boolean) {
@@ -103,12 +119,12 @@ internal class BuildscriptDeployer(private val _config: () -> GropifyConfig) : D
             val config = config.from(this).buildscript
             if (!isEnabled(config)) return
 
-            val className = buildscriptGenerator.propertiesClass(config.name)
+            val className = generator.propertiesClass(config.name)
             val accessorsClass = className.toClassOrNull(this) ?: throw RuntimeException(
                 """
                   Generated class "$className" not found, stop loading $this.
                   Please check whether the initialization process is interrupted and re-run Gradle sync.
-                  If this doesn't work, please manually delete the entire "${buildscriptAccessorsDir.absolutePath}" directory.
+                  If this doesn't work, please manually delete the entire "${accessorsDir.absolutePath}" directory.
                 """.trimIndent()
             )
 
@@ -130,6 +146,24 @@ internal class BuildscriptDeployer(private val _config: () -> GropifyConfig) : D
             .resolve(GropifyConfigureExtension.NAME)
             .resolve(GropifyConfig.ARTIFACTS_NAME)
             .apply { mkdirs() }
+
+    private fun createFingerprint(
+        allConfig: List<GropifyConfig.BuildscriptGenerateConfig>,
+        allProperties: List<PropertyMap>
+    ) = buildString {
+        appendLine(Gropify.VERSION)
+        allConfig.zip(allProperties).forEach { (config, properties) ->
+            appendLine(config.name)
+            appendLine(config.extensionName)
+            appendLine(config.isEnabled)
+            properties.toSortedMap().forEach { (key, value) ->
+                appendLine(key)
+                appendLine(value.raw)
+                appendLine(value.codeValue)
+                appendLine(value.type.qualifiedName)
+            }
+        }
+    }.calculateSha256()
 
     private fun isEnabled(config: GropifyConfig.BuildscriptGenerateConfig): Boolean {
         if (!config.isEnabled) Logger.debug("Config buildscript is disabled in ${config.name}, skipping deployment process.")

@@ -24,6 +24,7 @@
 package com.highcapable.gropify.plugin.compiler.extension
 
 import com.highcapable.gropify.gradle.api.entity.Dependency
+import com.highcapable.gropify.plugin.compiler.CodeCompileSpec
 import com.highcapable.gropify.plugin.compiler.CodeCompiler
 import com.palantir.javapoet.JavaFile
 import javax.tools.JavaFileObject
@@ -79,6 +80,24 @@ internal fun List<JavaFile>.compile(
         }
     }
 )
+
+/**
+ * Create [CodeCompileSpec] from [List]<[JavaFile]>.
+ * @receiver [List]<[JavaFile]>
+ * @param compileOnlyFiles the compile only [JavaFile] array.
+ * @return [CodeCompileSpec]
+ */
+@JvmName("toCompileSpecWithJavaFile")
+internal fun List<JavaFile>.toCompileSpec(
+    compileOnlyFiles: List<JavaFile> = mutableListOf()
+) = object : CodeCompileSpec {
+
+    override val isEmpty get() = this@toCompileSpec.isEmpty()
+
+    override fun compile(dependency: Dependency, outputDirPath: String) {
+        this@toCompileSpec.compile(dependency, outputDirPath, compileOnlyFiles)
+    }
+}
 
 /**
  * Compile [JavaFileObject] as a dependency.
