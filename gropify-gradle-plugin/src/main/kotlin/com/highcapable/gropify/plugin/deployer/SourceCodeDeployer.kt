@@ -46,7 +46,6 @@ import com.highcapable.kavaref.KavaRef.Companion.asResolver
 import org.gradle.api.Project
 import org.gradle.api.initialization.Settings
 import java.io.File
-import kotlin.collections.set
 
 /**
  * Source code deployer.
@@ -91,6 +90,7 @@ internal class SourceCodeDeployer(private val _config: () -> GropifyConfig) : De
             val properties = generateMap(config, ProjectDescriptor.create(project = this))
 
             if (!configModified && properties == cachedProjectProperties[getFullName()] && !outputDir.isEmpty()) {
+                ensureAndroidNamespaceCached(config)
                 if (config.isEnabled) configureSourceSets(project = this, properties)
                 return
             }
@@ -228,6 +228,10 @@ internal class SourceCodeDeployer(private val _config: () -> GropifyConfig) : De
             ?: "${GropifyConfig.DEFAULT_PACKAGE_NAME}.${getFullName(useColon = false).replace(":", "").flatted()}"
 
         return if (config.isIsolationEnabled) "$packageName.generated" else packageName
+    }
+
+    private fun Project.ensureAndroidNamespaceCached(config: GropifyConfig.CommonCodeGenerateConfig) {
+        if (config.packageName.isBlank()) AndroidProjectHelper.getNamespace(this)
     }
 
     private fun Project.generatedClassName(config: GropifyConfig.CommonCodeGenerateConfig): String {
