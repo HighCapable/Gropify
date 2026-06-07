@@ -63,7 +63,7 @@ internal fun String.createTypeValue(autoConversion: Boolean, key: String, type: 
             else ((trimmed.toIntOrNull() ?: 0) > 0).toString()
             Int::class -> {
                 val intValue = trimmed.toIntOrNull()
-                Gropify.require(intValue != null && intValue in Int.MIN_VALUE..Int.MAX_VALUE) {
+                Gropify.require(intValue != null) {
                     "The \"$key\" value \"$this\" cannot be converted to Int type."
                 }
 
@@ -107,9 +107,9 @@ internal fun String.createTypeValue(autoConversion: Boolean, key: String, type: 
         trimmed.isNumeric() ->
             if (!trimmed.contains(".")) {
                 val longValue = trimmed.toLongOrNull()
-                when (longValue) {
-                    null -> String::class
-                    in Int.MIN_VALUE..Int.MAX_VALUE -> Int::class
+                when {
+                    longValue == null -> String::class
+                    longValue.inIntRange() -> Int::class
                     else -> Long::class
                 }
             } else {
@@ -163,6 +163,8 @@ internal fun Any.createTypeValueByType(autoConversion: Boolean, key: String): Pr
 
     return PropertyTypeValue(this.toString(), finalValue, typeSpec)
 }
+
+private fun Long.inIntRange() = this >= Int.MIN_VALUE.toLong() && this <= Int.MAX_VALUE.toLong()
 
 /**
  * Property type value entity.
