@@ -25,8 +25,8 @@ gropify {
     global {
         jvm {
             includeKeys(
-                "^project\\..*\$".toRegex(),
-                "^gradle\\..*\$".toRegex()
+                "^project\\..*$".toRegex(),
+                "^gradle\\..*$".toRegex()
             )
 
             className = rootProject.name
