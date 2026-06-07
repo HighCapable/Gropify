@@ -16,7 +16,17 @@ Time zone of version release date: **UTC+8**
 
 :::
 
-### 1.0.1 | 2025.11.16 &ensp;<Badge type="tip" text="latest" vertical="middle" />
+### 1.0.2 | 2026.06.08 &ensp;<Badge type="tip" text="latest" vertical="middle" />
+
+- Optimized the buildscript accessors cache generation process, fixed the issue where multiple Gradle Daemons may read incomplete artifacts during simultaneous initialization
+- Optimized the integrity check for the buildscript accessors cache to prevent damaged `jar`, `pom`, or unready cache from being added to the buildscript classpath
+- Added the `sourceCode` configuration method block to configure source code options shared by `android`, `jvm`, and `kmp`
+- Optimized the source code configuration structure, merged `CommonCodeGenerateConfig` into `SourceCodeGenerateConfig`, and unified the configuration override order
+- Fixed the issue where `android-project-namespaces.json` may not be regenerated when generated source code already exists
+- Fixed the issue where property interpolation may resolve to an empty string when `includeKeys` filtering is enabled and the referenced key is not included in the generated result
+- Optimized integer boundary detection for automatic property type conversion to avoid unreachable checks or implicit range matching between `Int` and `Long`
+
+### 1.0.1 | 2025.11.16 &ensp;<Badge type="warning" text="stale" vertical="middle" />
 
 - Fixed the issue where `permanentKeyValues` was incorrectly configured to `replacementKeyValues`
 - Optimized the automatic type conversion function for property key-values, fixed the problem of negative long integers being converted to integers

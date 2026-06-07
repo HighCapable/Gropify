@@ -8,7 +8,17 @@
 
 :::
 
-### 1.0.1 | 2025.11.16 &ensp;<Badge type="tip" text="最新" vertical="middle" />
+### 1.0.2 | 2026.06.08 &ensp;<Badge type="tip" text="最新" vertical="middle" />
+
+- 优化构建脚本访问器缓存的生成流程，修复多个 Gradle Daemon 同时初始化时可能读取到未完成产物的问题
+- 优化构建脚本访问器缓存的完整性校验，避免损坏的 `jar`、`pom` 或未就绪的缓存被加入构建脚本类路径
+- 新增 `sourceCode` 配置方法块，用于统一配置 `android`、`jvm`、`kmp` 共享的源代码配置
+- 优化源代码配置结构，将 `CommonCodeGenerateConfig` 合并到 `SourceCodeGenerateConfig` 并统一配置覆盖顺序
+- 修复源代码已存在时 `android-project-namespaces.json` 可能不会重新生成的问题
+- 修复属性键值启用 `includeKeys` 过滤后，插值引用未包含在生成结果中的键时会被解析为空字符串的问题
+- 优化属性键值类型自动转换的整型边界判断，避免 `Int` 与 `Long` 边界识别存在不可达或隐式区间匹配的问题
+
+### 1.0.1 | 2025.11.16 &ensp;<Badge type="warning" text="过旧" vertical="middle" />
 
 - 修复 `permanentKeyValues` 被错误地配置到 `replacementKeyValues` 的问题
 - 优化属性键值的类型自动转换功能，修复负数长整型被转换为整型的问题

@@ -18,7 +18,7 @@ dependencyResolutionManagement {
 }
 
 plugins {
-    id("com.highcapable.gropify") version "1.0.1"
+    id("com.highcapable.gropify") version "1.0.2"
 }
 
 gropify {
