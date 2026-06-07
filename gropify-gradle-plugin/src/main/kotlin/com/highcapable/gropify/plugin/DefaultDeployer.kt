@@ -41,9 +41,6 @@ import org.gradle.api.initialization.Settings
 import java.io.File
 import java.io.FileReader
 import java.util.Properties
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.set
 import kotlin.properties.Delegates
 
 /**
@@ -149,11 +146,13 @@ internal object DefaultDeployer {
             }
         }
 
-        resolveProperties.filter { (key, value) ->
+        val allResolveKeyValues = resolveProperties.filter { (key, value) ->
             if (config.excludeNonStringValue)
                 key is CharSequence && key.isNotBlank() && value is CharSequence
             else key.toString().isNotBlank() && value != null
-        }.toStringMap().filter { (key, _) ->
+        }.toStringMap()
+
+        allResolveKeyValues.filter { (key, _) ->
             config.includeKeys.ifEmpty { null }?.any { content ->
                 when (content) {
                     is Regex -> content.matches(key)
@@ -178,7 +177,7 @@ internal object DefaultDeployer {
 
                     resolveKeys.add(matchKey)
                     var resolveValue = if (config.useValueInterpolation)
-                        resolveKeyValues[matchKey] ?: ""
+                        allResolveKeyValues[matchKey] ?: ""
                     else matchKey
                     resolveValue = resolveValue.removeSurroundingQuotes()
 
