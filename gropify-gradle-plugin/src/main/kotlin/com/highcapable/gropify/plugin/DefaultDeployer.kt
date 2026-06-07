@@ -40,7 +40,7 @@ import org.gradle.api.Project
 import org.gradle.api.initialization.Settings
 import java.io.File
 import java.io.FileReader
-import java.util.*
+import java.util.Properties
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
@@ -111,6 +111,7 @@ internal object DefaultDeployer {
         val resolveProperties = mutableMapOf<Any?, Any?>()
 
         val locations = mutableMapOf<String, String>()
+        val resolvedLocations = mutableMapOf<String, String>()
 
         config.permanentKeyValues.forEach { (key, value) ->
             properties[key] = value.createTypeValueByType(config.useTypeAutoConversion, key)
@@ -121,29 +122,29 @@ internal object DefaultDeployer {
                 GropifyLocation.CurrentProject -> createProperties(config, descriptor.currentDir).forEach {
                     resolveProperties.putAll(it)
 
-                    it.forEach { (key, _) -> locations[key.toString()] = location.name }
+                    it.forEach { (key, _) -> resolvedLocations[key.toString()] = location.name }
                 }
                 GropifyLocation.RootProject -> createProperties(config, descriptor.rootDir).forEach {
                     resolveProperties.putAll(it)
 
-                    it.forEach { (key, _) -> locations[key.toString()] = location.name }
+                    it.forEach { (key, _) -> resolvedLocations[key.toString()] = location.name }
                 }
                 GropifyLocation.Global -> createProperties(config, descriptor.homeDir).forEach {
                     resolveProperties.putAll(it)
 
-                    it.forEach { (key, _) -> locations[key.toString()] = location.name }
+                    it.forEach { (key, _) -> resolvedLocations[key.toString()] = location.name }
                 }
                 GropifyLocation.System -> {
                     val system = System.getProperties()
                     resolveProperties.putAll(system)
 
-                    system.forEach { (key, _) -> locations[key.toString()] = location.name }
+                    system.forEach { (key, _) -> resolvedLocations[key.toString()] = location.name }
                 }
                 GropifyLocation.SystemEnv -> {
                     val systemEnv = System.getenv()
                     resolveProperties.putAll(systemEnv)
 
-                    systemEnv.forEach { (key, _) -> locations[key] = location.name }
+                    systemEnv.forEach { (key, _) -> resolvedLocations[key] = location.name }
                 }
             }
         }
@@ -188,6 +189,9 @@ internal object DefaultDeployer {
                 if (value.hasInterpolation()) resolveKeyValues[key] = value.resolveValue()
             }
 
+            resolveKeyValues.forEach { (key, _) ->
+                resolvedLocations[key]?.let { locations[key] = it }
+            }
             properties.putAll(resolveKeyValues.map { (key, value) ->
                 key to value.createTypeValue(config.useTypeAutoConversion, key)
             })
