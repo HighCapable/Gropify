@@ -22,8 +22,6 @@
 package com.highcapable.gropify.plugin.generator
 
 import com.highcapable.gropify.debug.Logger
-import com.highcapable.gropify.debug.require
-import com.highcapable.gropify.plugin.Gropify
 import com.highcapable.gropify.plugin.config.proxy.GropifyConfig
 import com.highcapable.gropify.plugin.deployer.extension.ProjectType
 import com.highcapable.gropify.plugin.generator.config.GenerateConfig
@@ -52,10 +50,6 @@ internal class SourceCodeGenerator {
         generateConfig: GenerateConfig,
         keyValues: PropertyMap
     ): List<SourceCodeSpec> {
-        Gropify.require(config is GropifyConfig.CommonCodeGenerateConfig) {
-            "Only Android, Jvm, Kotlin Multiplatform project is supported for now."
-        }
-
         Logger.debug(
             """
               Generated source for ${config.name}
@@ -67,6 +61,7 @@ internal class SourceCodeGenerator {
               ----------
             """.trimIndent()
         )
+
         return listOf(
             java.build(config, generateConfig, keyValues),
             kotlin.build(config, generateConfig, keyValues)

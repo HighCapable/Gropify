@@ -45,7 +45,7 @@ internal class KotlinCodeGenerator {
      * Build Kotlin source code.
      * @return [SourceCodeSpec]
      */
-    fun build(config: GropifyConfig.CommonCodeGenerateConfig, generateConfig: GenerateConfig, keyValues: PropertyMap) = runCatching {
+    fun build(config: GropifyConfig.SourceCodeGenerateConfig, generateConfig: GenerateConfig, keyValues: PropertyMap) = runCatching {
         val fileSpec = FileSpec.builder(generateConfig.packageName, generateConfig.className).apply {
             addType(TypeSpec.objectBuilder(generateConfig.className).apply {
                 addFileComment(

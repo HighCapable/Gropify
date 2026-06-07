@@ -66,6 +66,8 @@ internal interface GropifyConfig {
 
         val buildscript: BuildscriptGenerateConfig
 
+        val sourceCode: SourceCodeGenerateConfig
+
         val android: AndroidGenerateConfig
 
         val jvm: JvmGenerateConfig
@@ -94,7 +96,7 @@ internal interface GropifyConfig {
     /**
      * Jvm project generate configuration interface.
      */
-    interface JvmGenerateConfig : CommonCodeGenerateConfig {
+    interface JvmGenerateConfig : SourceCodeGenerateConfig {
 
         /** Whether to use Kotlin language generation. */
         val useKotlin: Boolean
@@ -103,12 +105,15 @@ internal interface GropifyConfig {
     /**
      * Kotlin Multiplatform project generate configuration interface.
      */
-    interface KmpGenerateConfig : CommonCodeGenerateConfig
+    interface KmpGenerateConfig : SourceCodeGenerateConfig
 
     /**
-     * Project common code generate configuration interface.
+     * Project source code generate configuration interface.
      */
-    interface CommonCodeGenerateConfig : SourceCodeGenerateConfig {
+    interface SourceCodeGenerateConfig : CommonGenerateConfig {
+
+        /** Custom generated directory path. */
+        val generateDirPath: String
 
         /** Custom deployment `sourceSet` name. */
         val sourceSetName: String
@@ -124,15 +129,6 @@ internal interface GropifyConfig {
 
         /** Whether to enable code isolation. */
         val isIsolationEnabled: Boolean
-    }
-
-    /**
-     * Project code generate configuration interface.
-     */
-    interface SourceCodeGenerateConfig : CommonGenerateConfig {
-
-        /** Custom generated directory path. */
-        val generateDirPath: String
     }
 
     /**

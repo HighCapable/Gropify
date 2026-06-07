@@ -30,14 +30,6 @@ import com.highcapable.gropify.plugin.generator.extension.PropertyValueRule
  */
 internal object DefaultConfig {
 
-    fun createGenerateConfig(name: String, common: GropifyConfigureExtension.CommonGenerateConfigureScope? = null) =
-        object : GropifyConfig.GenerateConfig {
-            override val buildscript get() = createBuildscriptGenerateConfig(name, common)
-            override val android get() = createAndroidGenerateConfig(name, common)
-            override val jvm get() = createJvmGenerateConfig(name, common)
-            override val kmp get() = createKmpGenerateConfig(name, common)
-        }
-
     fun createBuildscriptGenerateConfig(
         name: String,
         selfCommon: GropifyConfigureExtension.CommonGenerateConfigureScope? = null,
@@ -127,6 +119,82 @@ internal object DefaultConfig {
         override val isIsolationEnabled get() = true
 
         override val manifestPlaceholders get() = false
+
+        override val isEnabled
+            get() = selfCommon?.isEnabled
+                ?: globalCommon?.isEnabled
+                ?: createCommonGenerateConfig(name).isEnabled
+
+        override val existsPropertyFiles
+            get() = selfCommon?.existsPropertyFiles
+                ?: globalCommon?.existsPropertyFiles
+                ?: createCommonGenerateConfig(name).existsPropertyFiles
+
+        override val permanentKeyValues
+            get() = selfCommon?.permanentKeyValues
+                ?: globalCommon?.permanentKeyValues
+                ?: createCommonGenerateConfig(name).permanentKeyValues
+
+        override val replacementKeyValues
+            get() = selfCommon?.replacementKeyValues
+                ?: globalCommon?.replacementKeyValues
+                ?: createCommonGenerateConfig(name).replacementKeyValues
+
+        override val excludeKeys
+            get() = selfCommon?.excludeKeys
+                ?: globalCommon?.excludeKeys
+                ?: createCommonGenerateConfig(name).excludeKeys
+
+        override val includeKeys
+            get() = selfCommon?.includeKeys
+                ?: globalCommon?.includeKeys
+                ?: createCommonGenerateConfig(name).includeKeys
+
+        override val keyValuesRules
+            get() = selfCommon?.keyValuesRules
+                ?: globalCommon?.keyValuesRules
+                ?: createCommonGenerateConfig(name).keyValuesRules
+
+        override val excludeNonStringValue
+            get() = selfCommon?.excludeNonStringValue
+                ?: globalCommon?.excludeNonStringValue
+                ?: createCommonGenerateConfig(name).excludeNonStringValue
+
+        override val useTypeAutoConversion
+            get() = selfCommon?.useTypeAutoConversion
+                ?: globalCommon?.useTypeAutoConversion
+                ?: createCommonGenerateConfig(name).useTypeAutoConversion
+
+        override val useValueInterpolation
+            get() = selfCommon?.useValueInterpolation
+                ?: globalCommon?.useValueInterpolation
+                ?: createCommonGenerateConfig(name).useValueInterpolation
+
+        override val locations
+            get() = selfCommon?.locations
+                ?: globalCommon?.locations
+                ?: createCommonGenerateConfig(name).locations
+    }
+
+    fun createSourceCodeGenerateConfig(
+        name: String,
+        selfCommon: GropifyConfigureExtension.CommonGenerateConfigureScope? = null,
+        globalCommon: GropifyConfigureExtension.CommonGenerateConfigureScope? = null
+    ) = object : GropifyConfig.SourceCodeGenerateConfig {
+
+        override val name get() = name
+
+        override val generateDirPath get() = GropifyConfig.DEFAULT_COMMON_CODE_GENERATE_DIR_PATH
+
+        override val sourceSetName get() = GropifyConfig.DEFAULT_ANDROID_JVM_SOURCE_SET_NAME
+
+        override val packageName get() = ""
+
+        override val className get() = ""
+
+        override val isRestrictedAccessEnabled get() = false
+
+        override val isIsolationEnabled get() = true
 
         override val isEnabled
             get() = selfCommon?.isEnabled

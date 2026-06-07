@@ -209,7 +209,7 @@ internal class SourceCodeDeployer(private val _config: () -> GropifyConfig) : De
         }
     }
 
-    private fun decideSourceCodeType(config: GropifyConfig.CommonCodeGenerateConfig, type: ProjectType) = when (type) {
+    private fun decideSourceCodeType(config: GropifyConfig.SourceCodeGenerateConfig, type: ProjectType) = when (type) {
         ProjectType.Android, ProjectType.Kotlin ->
             if (config is GropifyConfig.JvmGenerateConfig && !config.useKotlin)
                 SourceCodeSpec.Type.Java
@@ -219,9 +219,9 @@ internal class SourceCodeDeployer(private val _config: () -> GropifyConfig) : De
         else -> Gropify.error("Unsupported project type for source code generation.")
     }
 
-    private fun resolveGenerateDirPath(config: GropifyConfig.CommonCodeGenerateConfig) = "${config.generateDirPath}/src/main"
+    private fun resolveGenerateDirPath(config: GropifyConfig.SourceCodeGenerateConfig) = "${config.generateDirPath}/src/main"
 
-    private fun Project.generatedPackageName(config: GropifyConfig.CommonCodeGenerateConfig): String {
+    private fun Project.generatedPackageName(config: GropifyConfig.SourceCodeGenerateConfig): String {
         val packageName = config.packageName.ifBlank { null }
             ?: AndroidProjectHelper.getNamespace(this)
             ?: group.toString().ifBlank { null }
@@ -230,11 +230,11 @@ internal class SourceCodeDeployer(private val _config: () -> GropifyConfig) : De
         return if (config.isIsolationEnabled) "$packageName.generated" else packageName
     }
 
-    private fun Project.ensureAndroidNamespaceCached(config: GropifyConfig.CommonCodeGenerateConfig) {
+    private fun Project.ensureAndroidNamespaceCached(config: GropifyConfig.SourceCodeGenerateConfig) {
         if (config.packageName.isBlank()) AndroidProjectHelper.getNamespace(this)
     }
 
-    private fun Project.generatedClassName(config: GropifyConfig.CommonCodeGenerateConfig): String {
+    private fun Project.generatedClassName(config: GropifyConfig.SourceCodeGenerateConfig): String {
         val className = config.className.ifBlank { null }
             ?: getFullName(useColon = false).replace(":", "_").upperCamelcase().ifBlank { null }
             ?: "Undefined"

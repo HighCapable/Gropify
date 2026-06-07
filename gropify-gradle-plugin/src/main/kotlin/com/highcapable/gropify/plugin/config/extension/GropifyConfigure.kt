@@ -35,432 +35,281 @@ internal fun GropifyConfigureExtension.GenerateConfigureScope.create(
 ) = object : GropifyConfig.GenerateConfig {
 
     override val buildscript
-        get() = this@create.buildscriptConfigure?.create(name, global.buildscriptConfigure, this@create.commonConfigure, global.commonConfigure)
-            ?: global.buildscriptConfigure?.create(name, this@create.buildscriptConfigure ?: global.buildscriptConfigure)
-            ?: DefaultConfig.createGenerateConfig(name, this@create.commonConfigure ?: global.commonConfigure).buildscript
+        get() = createBuildscriptGenerateConfig(
+            name = name,
+            self = this@create.buildscriptConfigure,
+            global = global.buildscriptConfigure,
+            selfCommon = this@create.commonConfigure,
+            globalCommon = global.commonConfigure
+        )
+
+    override val sourceCode
+        get() = createSourceCodeGenerateConfig(
+            name = name,
+            self = listOf(this@create.sourceCodeConfigure),
+            global = listOf(global.sourceCodeConfigure),
+            selfCommon = this@create.commonConfigure,
+            globalCommon = global.commonConfigure,
+            default = DefaultConfig.createSourceCodeGenerateConfig(name, this@create.commonConfigure, global.commonConfigure)
+        )
 
     override val android
-        get() = this@create.androidConfigure?.create(name, global.androidConfigure, this@create.commonConfigure, global.commonConfigure)
-            ?: global.androidConfigure?.create(name, this@create.androidConfigure ?: global.androidConfigure)
-            ?: DefaultConfig.createGenerateConfig(name, this@create.commonConfigure ?: global.commonConfigure).android
+        get() = createAndroidGenerateConfig(
+            name = name,
+            self = this@create.androidConfigure,
+            global = global.androidConfigure,
+            selfSourceCode = this@create.sourceCodeConfigure,
+            globalSourceCode = global.sourceCodeConfigure,
+            selfCommon = this@create.commonConfigure,
+            globalCommon = global.commonConfigure
+        )
 
     override val jvm
-        get() = this@create.jvmConfigure?.create(name, global.jvmConfigure, this@create.commonConfigure, global.commonConfigure)
-            ?: global.jvmConfigure?.create(name, this@create.jvmConfigure ?: global.jvmConfigure)
-            ?: DefaultConfig.createGenerateConfig(name, this@create.commonConfigure ?: global.commonConfigure).jvm
+        get() = createJvmGenerateConfig(
+            name = name,
+            self = this@create.jvmConfigure,
+            global = global.jvmConfigure,
+            selfSourceCode = this@create.sourceCodeConfigure,
+            globalSourceCode = global.sourceCodeConfigure,
+            selfCommon = this@create.commonConfigure,
+            globalCommon = global.commonConfigure
+        )
 
     override val kmp
-        get() = this@create.kmpConfigure?.create(name, global.kmpConfigure, this@create.commonConfigure, global.commonConfigure)
-            ?: global.kmpConfigure?.create(name, this@create.kmpConfigure ?: global.kmpConfigure)
-            ?: DefaultConfig.createGenerateConfig(name, this@create.commonConfigure ?: global.commonConfigure).kmp
+        get() = createKmpGenerateConfig(
+            name = name,
+            self = this@create.kmpConfigure,
+            global = global.kmpConfigure,
+            selfSourceCode = this@create.sourceCodeConfigure,
+            globalSourceCode = global.sourceCodeConfigure,
+            selfCommon = this@create.commonConfigure,
+            globalCommon = global.commonConfigure
+        )
 }
 
-private fun GropifyConfigureExtension.BuildscriptGenerateConfigureScope.create(
+private fun createBuildscriptGenerateConfig(
     name: String,
+    self: GropifyConfigureExtension.BuildscriptGenerateConfigureScope? = null,
     global: GropifyConfigureExtension.BuildscriptGenerateConfigureScope? = null,
     selfCommon: GropifyConfigureExtension.CommonGenerateConfigureScope? = null,
     globalCommon: GropifyConfigureExtension.CommonGenerateConfigureScope? = null
-) = object : GropifyConfig.BuildscriptGenerateConfig {
-
-    override val name get() = name
+) = object : GropifyConfig.BuildscriptGenerateConfig, GropifyConfig.CommonGenerateConfig by createCommonGenerateConfig(
+    name = name,
+    self = listOf(self),
+    global = listOf(global),
+    selfCommon = selfCommon,
+    globalCommon = globalCommon,
+    default = DefaultConfig.createBuildscriptGenerateConfig(name, selfCommon, globalCommon)
+) {
 
     override val extensionName
-        get() = this@create.extensionName.ifBlank { null }
+        get() = self?.extensionName?.ifBlank { null }
             ?: global?.extensionName?.ifBlank { null }
             ?: DefaultConfig.createBuildscriptGenerateConfig(name, selfCommon, globalCommon).extensionName
-
-    override val isEnabled
-        get() = this@create.isEnabled
-            ?: selfCommon?.isEnabled
-            ?: global?.isEnabled
-            ?: globalCommon?.isEnabled
-            ?: DefaultConfig.createBuildscriptGenerateConfig(name, selfCommon, globalCommon).isEnabled
-
-    override val existsPropertyFiles
-        get() = this@create.existsPropertyFiles
-            ?: global?.existsPropertyFiles
-            ?: DefaultConfig.createBuildscriptGenerateConfig(name, selfCommon, globalCommon).existsPropertyFiles
-
-    override val permanentKeyValues
-        get() = this@create.permanentKeyValues
-            ?: global?.permanentKeyValues
-            ?: DefaultConfig.createBuildscriptGenerateConfig(name, selfCommon, globalCommon).permanentKeyValues
-
-    override val replacementKeyValues
-        get() = this@create.replacementKeyValues
-            ?: global?.replacementKeyValues
-            ?: DefaultConfig.createBuildscriptGenerateConfig(name, selfCommon, globalCommon).replacementKeyValues
-
-    override val excludeKeys
-        get() = this@create.excludeKeys
-            ?: global?.excludeKeys
-            ?: DefaultConfig.createBuildscriptGenerateConfig(name, selfCommon, globalCommon).excludeKeys
-
-    override val includeKeys
-        get() = this@create.includeKeys
-            ?: global?.includeKeys
-            ?: DefaultConfig.createBuildscriptGenerateConfig(name, selfCommon, globalCommon).includeKeys
-
-    override val keyValuesRules
-        get() = this@create.keyValuesRules
-            ?: global?.keyValuesRules
-            ?: DefaultConfig.createBuildscriptGenerateConfig(name, selfCommon, globalCommon).keyValuesRules
-
-    override val excludeNonStringValue
-        get() = this@create.excludeNonStringValue
-            ?: selfCommon?.excludeNonStringValue
-            ?: global?.excludeNonStringValue
-            ?: globalCommon?.excludeNonStringValue
-            ?: DefaultConfig.createBuildscriptGenerateConfig(name, selfCommon, globalCommon).excludeNonStringValue
-
-    override val useTypeAutoConversion
-        get() = this@create.useTypeAutoConversion
-            ?: selfCommon?.useTypeAutoConversion
-            ?: global?.useTypeAutoConversion
-            ?: globalCommon?.useTypeAutoConversion
-            ?: DefaultConfig.createBuildscriptGenerateConfig(name, selfCommon, globalCommon).useTypeAutoConversion
-
-    override val useValueInterpolation
-        get() = this@create.useValueInterpolation
-            ?: selfCommon?.useValueInterpolation
-            ?: global?.useValueInterpolation
-            ?: globalCommon?.useValueInterpolation
-            ?: DefaultConfig.createBuildscriptGenerateConfig(name, selfCommon, globalCommon).useValueInterpolation
-
-    override val locations
-        get() = this@create.locations
-            ?: selfCommon?.locations
-            ?: global?.locations
-            ?: globalCommon?.locations
-            ?: DefaultConfig.createBuildscriptGenerateConfig(name, selfCommon, globalCommon).locations
 }
 
-private fun GropifyConfigureExtension.AndroidGenerateConfigureScope.create(
+private fun createSourceCodeGenerateConfig(
     name: String,
-    global: GropifyConfigureExtension.AndroidGenerateConfigureScope? = null,
+    self: List<GropifyConfigureExtension.SourceCodeGenerateConfigureScope?> = emptyList(),
+    global: List<GropifyConfigureExtension.SourceCodeGenerateConfigureScope?> = emptyList(),
     selfCommon: GropifyConfigureExtension.CommonGenerateConfigureScope? = null,
-    globalCommon: GropifyConfigureExtension.CommonGenerateConfigureScope? = null
-) = object : GropifyConfig.AndroidGenerateConfig {
+    globalCommon: GropifyConfigureExtension.CommonGenerateConfigureScope? = null,
+    default: GropifyConfig.SourceCodeGenerateConfig
+) = object : GropifyConfig.SourceCodeGenerateConfig, GropifyConfig.CommonGenerateConfig by createCommonGenerateConfig(
+    name = name,
+    self = self,
+    global = global,
+    selfCommon = selfCommon,
+    globalCommon = globalCommon,
+    default = default
+) {
+
+    override val name get() = name
+
+    override val generateDirPath
+        get() = self.firstNotNullOfOrNull { it?.generateDirPath?.ifBlank { null } }
+            ?: global.firstNotNullOfOrNull { it?.generateDirPath?.ifBlank { null } }
+            ?: default.generateDirPath
+
+    override val sourceSetName
+        get() = self.firstNotNullOfOrNull { it?.sourceSetName?.ifBlank { null } }
+            ?: global.firstNotNullOfOrNull { it?.sourceSetName?.ifBlank { null } }
+            ?: default.sourceSetName
+
+    override val packageName
+        get() = self.firstNotNullOfOrNull { it?.packageName?.ifBlank { null } }
+            ?: global.firstNotNullOfOrNull { it?.packageName?.ifBlank { null } }
+            ?: default.packageName
+
+    override val className
+        get() = self.firstNotNullOfOrNull { it?.className?.ifBlank { null } }
+            ?: global.firstNotNullOfOrNull { it?.className?.ifBlank { null } }
+            ?: default.className
+
+    override val isRestrictedAccessEnabled
+        get() = self.firstNotNullOfOrNull { it?.isRestrictedAccessEnabled }
+            ?: global.firstNotNullOfOrNull { it?.isRestrictedAccessEnabled }
+            ?: default.isRestrictedAccessEnabled
+
+    override val isIsolationEnabled
+        get() = self.firstNotNullOfOrNull { it?.isIsolationEnabled }
+            ?: global.firstNotNullOfOrNull { it?.isIsolationEnabled }
+            ?: default.isIsolationEnabled
+}
+
+private fun createCommonGenerateConfig(
+    name: String,
+    self: List<GropifyConfigureExtension.CommonGenerateConfigureScope?> = emptyList(),
+    global: List<GropifyConfigureExtension.CommonGenerateConfigureScope?> = emptyList(),
+    selfCommon: GropifyConfigureExtension.CommonGenerateConfigureScope? = null,
+    globalCommon: GropifyConfigureExtension.CommonGenerateConfigureScope? = null,
+    default: GropifyConfig.CommonGenerateConfig
+) = object : GropifyConfig.CommonGenerateConfig {
 
     override val name get() = name
 
     override val isEnabled
-        get() = this@create.isEnabled
+        get() = self.firstNotNullOfOrNull { it?.isEnabled }
             ?: selfCommon?.isEnabled
-            ?: global?.isEnabled
+            ?: global.firstNotNullOfOrNull { it?.isEnabled }
             ?: globalCommon?.isEnabled
-            ?: DefaultConfig.createAndroidGenerateConfig(name, selfCommon, globalCommon).isEnabled
+            ?: default.isEnabled
 
-    override val generateDirPath
-        get() = this@create.generateDirPath.ifBlank { null }
-            ?: global?.generateDirPath?.ifBlank { null }
-            ?: DefaultConfig.createAndroidGenerateConfig(name, selfCommon, globalCommon).generateDirPath
+    override val existsPropertyFiles
+        get() = self.firstNotNullOfOrNull { it?.existsPropertyFiles }
+            ?: selfCommon?.existsPropertyFiles
+            ?: global.firstNotNullOfOrNull { it?.existsPropertyFiles }
+            ?: globalCommon?.existsPropertyFiles
+            ?: default.existsPropertyFiles
 
-    override val sourceSetName
-        get() = this@create.sourceSetName.ifBlank { null }
-            ?: global?.sourceSetName?.ifBlank { null }
-            ?: DefaultConfig.createAndroidGenerateConfig(name, selfCommon, globalCommon).sourceSetName
+    override val permanentKeyValues
+        get() = self.firstNotNullOfOrNull { it?.permanentKeyValues }
+            ?: selfCommon?.permanentKeyValues
+            ?: global.firstNotNullOfOrNull { it?.permanentKeyValues }
+            ?: globalCommon?.permanentKeyValues
+            ?: default.permanentKeyValues
+
+    override val replacementKeyValues
+        get() = self.firstNotNullOfOrNull { it?.replacementKeyValues }
+            ?: selfCommon?.replacementKeyValues
+            ?: global.firstNotNullOfOrNull { it?.replacementKeyValues }
+            ?: globalCommon?.replacementKeyValues
+            ?: default.replacementKeyValues
+
+    override val excludeKeys
+        get() = self.firstNotNullOfOrNull { it?.excludeKeys }
+            ?: selfCommon?.excludeKeys
+            ?: global.firstNotNullOfOrNull { it?.excludeKeys }
+            ?: globalCommon?.excludeKeys
+            ?: default.excludeKeys
+
+    override val includeKeys
+        get() = self.firstNotNullOfOrNull { it?.includeKeys }
+            ?: selfCommon?.includeKeys
+            ?: global.firstNotNullOfOrNull { it?.includeKeys }
+            ?: globalCommon?.includeKeys
+            ?: default.includeKeys
+
+    override val keyValuesRules
+        get() = self.firstNotNullOfOrNull { it?.keyValuesRules }
+            ?: selfCommon?.keyValuesRules
+            ?: global.firstNotNullOfOrNull { it?.keyValuesRules }
+            ?: globalCommon?.keyValuesRules
+            ?: default.keyValuesRules
+
+    override val excludeNonStringValue
+        get() = self.firstNotNullOfOrNull { it?.excludeNonStringValue }
+            ?: selfCommon?.excludeNonStringValue
+            ?: global.firstNotNullOfOrNull { it?.excludeNonStringValue }
+            ?: globalCommon?.excludeNonStringValue
+            ?: default.excludeNonStringValue
+
+    override val useTypeAutoConversion
+        get() = self.firstNotNullOfOrNull { it?.useTypeAutoConversion }
+            ?: selfCommon?.useTypeAutoConversion
+            ?: global.firstNotNullOfOrNull { it?.useTypeAutoConversion }
+            ?: globalCommon?.useTypeAutoConversion
+            ?: default.useTypeAutoConversion
+
+    override val useValueInterpolation
+        get() = self.firstNotNullOfOrNull { it?.useValueInterpolation }
+            ?: selfCommon?.useValueInterpolation
+            ?: global.firstNotNullOfOrNull { it?.useValueInterpolation }
+            ?: globalCommon?.useValueInterpolation
+            ?: default.useValueInterpolation
+
+    override val locations
+        get() = self.firstNotNullOfOrNull { it?.locations }
+            ?: selfCommon?.locations
+            ?: global.firstNotNullOfOrNull { it?.locations }
+            ?: globalCommon?.locations
+            ?: default.locations
+}
+
+private fun createAndroidGenerateConfig(
+    name: String,
+    self: GropifyConfigureExtension.AndroidGenerateConfigureScope? = null,
+    global: GropifyConfigureExtension.AndroidGenerateConfigureScope? = null,
+    selfSourceCode: GropifyConfigureExtension.SourceCodeGenerateConfigureScope? = null,
+    globalSourceCode: GropifyConfigureExtension.SourceCodeGenerateConfigureScope? = null,
+    selfCommon: GropifyConfigureExtension.CommonGenerateConfigureScope? = null,
+    globalCommon: GropifyConfigureExtension.CommonGenerateConfigureScope? = null
+) = object : GropifyConfig.AndroidGenerateConfig, GropifyConfig.SourceCodeGenerateConfig by createSourceCodeGenerateConfig(
+    name = name,
+    self = listOf(self, selfSourceCode),
+    global = listOf(global, globalSourceCode),
+    selfCommon = selfCommon,
+    globalCommon = globalCommon,
+    default = DefaultConfig.createAndroidGenerateConfig(name, selfCommon, globalCommon)
+) {
 
     override val useKotlin
-        get() = this@create.useKotlin
+        get() = self?.useKotlin
             ?: global?.useKotlin
             ?: DefaultConfig.createAndroidGenerateConfig(name, selfCommon, globalCommon).useKotlin
 
-    override val packageName
-        get() = this@create.packageName.ifBlank { null }
-            ?: global?.packageName?.ifBlank { null }
-            ?: DefaultConfig.createAndroidGenerateConfig(name, selfCommon, globalCommon).packageName
-
-    override val className
-        get() = this@create.className.ifBlank { null }
-            ?: global?.className?.ifBlank { null }
-            ?: DefaultConfig.createAndroidGenerateConfig(name, selfCommon, globalCommon).className
-
-    override val isRestrictedAccessEnabled
-        get() = this@create.isRestrictedAccessEnabled
-            ?: global?.isRestrictedAccessEnabled
-            ?: DefaultConfig.createAndroidGenerateConfig(name, selfCommon, globalCommon).isRestrictedAccessEnabled
-
-    override val isIsolationEnabled
-        get() = this@create.isIsolationEnabled
-            ?: global?.isIsolationEnabled
-            ?: DefaultConfig.createAndroidGenerateConfig(name, selfCommon, globalCommon).isIsolationEnabled
-
     override val manifestPlaceholders
-        get() = this@create.manifestPlaceholders
+        get() = self?.manifestPlaceholders
             ?: global?.manifestPlaceholders
             ?: DefaultConfig.createAndroidGenerateConfig(name, selfCommon, globalCommon).manifestPlaceholders
-
-    override val existsPropertyFiles
-        get() = this@create.existsPropertyFiles
-            ?: global?.existsPropertyFiles
-            ?: DefaultConfig.createAndroidGenerateConfig(name, selfCommon, globalCommon).existsPropertyFiles
-
-    override val permanentKeyValues
-        get() = this@create.permanentKeyValues
-            ?: global?.permanentKeyValues
-            ?: DefaultConfig.createAndroidGenerateConfig(name, selfCommon, globalCommon).permanentKeyValues
-
-    override val replacementKeyValues
-        get() = this@create.replacementKeyValues
-            ?: global?.replacementKeyValues
-            ?: DefaultConfig.createAndroidGenerateConfig(name, selfCommon, globalCommon).replacementKeyValues
-
-    override val excludeKeys
-        get() = this@create.excludeKeys
-            ?: global?.excludeKeys
-            ?: DefaultConfig.createAndroidGenerateConfig(name, selfCommon, globalCommon).excludeKeys
-
-    override val includeKeys
-        get() = this@create.includeKeys
-            ?: global?.includeKeys
-            ?: DefaultConfig.createAndroidGenerateConfig(name, selfCommon, globalCommon).includeKeys
-
-    override val keyValuesRules
-        get() = this@create.keyValuesRules
-            ?: global?.keyValuesRules
-            ?: DefaultConfig.createAndroidGenerateConfig(name, selfCommon, globalCommon).keyValuesRules
-
-    override val excludeNonStringValue
-        get() = this@create.excludeNonStringValue
-            ?: selfCommon?.excludeNonStringValue
-            ?: global?.excludeNonStringValue
-            ?: globalCommon?.excludeNonStringValue
-            ?: DefaultConfig.createAndroidGenerateConfig(name, selfCommon, globalCommon).excludeNonStringValue
-
-    override val useTypeAutoConversion
-        get() = this@create.useTypeAutoConversion
-            ?: selfCommon?.useTypeAutoConversion
-            ?: global?.useTypeAutoConversion
-            ?: globalCommon?.useTypeAutoConversion
-            ?: DefaultConfig.createAndroidGenerateConfig(name, selfCommon, globalCommon).useTypeAutoConversion
-
-    override val useValueInterpolation
-        get() = this@create.useValueInterpolation
-            ?: selfCommon?.useValueInterpolation
-            ?: global?.useValueInterpolation
-            ?: globalCommon?.useValueInterpolation
-            ?: DefaultConfig.createAndroidGenerateConfig(name, selfCommon, globalCommon).useValueInterpolation
-
-    override val locations
-        get() = this@create.locations
-            ?: selfCommon?.locations
-            ?: global?.locations
-            ?: globalCommon?.locations
-            ?: DefaultConfig.createAndroidGenerateConfig(name, selfCommon, globalCommon).locations
 }
 
-private fun GropifyConfigureExtension.JvmGenerateConfigureScope.create(
+private fun createJvmGenerateConfig(
     name: String,
+    self: GropifyConfigureExtension.JvmGenerateConfigureScope? = null,
     global: GropifyConfigureExtension.JvmGenerateConfigureScope? = null,
+    selfSourceCode: GropifyConfigureExtension.SourceCodeGenerateConfigureScope? = null,
+    globalSourceCode: GropifyConfigureExtension.SourceCodeGenerateConfigureScope? = null,
     selfCommon: GropifyConfigureExtension.CommonGenerateConfigureScope? = null,
     globalCommon: GropifyConfigureExtension.CommonGenerateConfigureScope? = null
-) = object : GropifyConfig.JvmGenerateConfig {
-
-    override val name get() = name
-
-    override val isEnabled
-        get() = this@create.isEnabled
-            ?: selfCommon?.isEnabled
-            ?: global?.isEnabled
-            ?: globalCommon?.isEnabled
-            ?: DefaultConfig.createJvmGenerateConfig(name, selfCommon, globalCommon).isEnabled
-
-    override val generateDirPath
-        get() = this@create.generateDirPath.ifBlank { null }
-            ?: global?.generateDirPath?.ifBlank { null }
-            ?: DefaultConfig.createJvmGenerateConfig(name, selfCommon, globalCommon).generateDirPath
-
-    override val sourceSetName
-        get() = this@create.sourceSetName.ifBlank { null }
-            ?: global?.sourceSetName?.ifBlank { null }
-            ?: DefaultConfig.createJvmGenerateConfig(name, selfCommon, globalCommon).sourceSetName
+) = object : GropifyConfig.JvmGenerateConfig, GropifyConfig.SourceCodeGenerateConfig by createSourceCodeGenerateConfig(
+    name = name,
+    self = listOf(self, selfSourceCode),
+    global = listOf(global, globalSourceCode),
+    selfCommon = selfCommon,
+    globalCommon = globalCommon,
+    default = DefaultConfig.createJvmGenerateConfig(name, selfCommon, globalCommon)
+) {
 
     override val useKotlin
-        get() = this@create.useKotlin
+        get() = self?.useKotlin
             ?: global?.useKotlin
             ?: DefaultConfig.createJvmGenerateConfig(name, selfCommon, globalCommon).useKotlin
-
-    override val packageName
-        get() = this@create.packageName.ifBlank { null }
-            ?: global?.packageName?.ifBlank { null }
-            ?: DefaultConfig.createJvmGenerateConfig(name, selfCommon, globalCommon).packageName
-
-    override val className
-        get() = this@create.className.ifBlank { null }
-            ?: global?.className?.ifBlank { null }
-            ?: DefaultConfig.createJvmGenerateConfig(name, selfCommon, globalCommon).className
-
-    override val isRestrictedAccessEnabled
-        get() = this@create.isRestrictedAccessEnabled
-            ?: global?.isRestrictedAccessEnabled
-            ?: DefaultConfig.createJvmGenerateConfig(name, selfCommon, globalCommon).isRestrictedAccessEnabled
-
-    override val isIsolationEnabled
-        get() = this@create.isIsolationEnabled
-            ?: global?.isIsolationEnabled
-            ?: DefaultConfig.createJvmGenerateConfig(name, selfCommon, globalCommon).isIsolationEnabled
-
-    override val existsPropertyFiles
-        get() = this@create.existsPropertyFiles
-            ?: global?.existsPropertyFiles
-            ?: DefaultConfig.createJvmGenerateConfig(name, selfCommon, globalCommon).existsPropertyFiles
-
-    override val permanentKeyValues
-        get() = this@create.permanentKeyValues
-            ?: global?.permanentKeyValues
-            ?: DefaultConfig.createJvmGenerateConfig(name, selfCommon, globalCommon).permanentKeyValues
-
-    override val replacementKeyValues
-        get() = this@create.replacementKeyValues
-            ?: global?.replacementKeyValues
-            ?: DefaultConfig.createJvmGenerateConfig(name, selfCommon, globalCommon).replacementKeyValues
-
-    override val excludeKeys
-        get() = this@create.excludeKeys
-            ?: global?.excludeKeys
-            ?: DefaultConfig.createJvmGenerateConfig(name, selfCommon, globalCommon).excludeKeys
-
-    override val includeKeys
-        get() = this@create.includeKeys
-            ?: global?.includeKeys
-            ?: DefaultConfig.createJvmGenerateConfig(name, selfCommon, globalCommon).includeKeys
-
-    override val keyValuesRules
-        get() = this@create.keyValuesRules
-            ?: global?.keyValuesRules
-            ?: DefaultConfig.createJvmGenerateConfig(name, selfCommon, globalCommon).keyValuesRules
-
-    override val excludeNonStringValue
-        get() = this@create.excludeNonStringValue
-            ?: selfCommon?.excludeNonStringValue
-            ?: global?.excludeNonStringValue
-            ?: globalCommon?.excludeNonStringValue
-            ?: DefaultConfig.createJvmGenerateConfig(name, selfCommon, globalCommon).excludeNonStringValue
-
-    override val useTypeAutoConversion
-        get() = this@create.useTypeAutoConversion
-            ?: selfCommon?.useTypeAutoConversion
-            ?: global?.useTypeAutoConversion
-            ?: globalCommon?.useTypeAutoConversion
-            ?: DefaultConfig.createJvmGenerateConfig(name, selfCommon, globalCommon).useTypeAutoConversion
-
-    override val useValueInterpolation
-        get() = this@create.useValueInterpolation
-            ?: selfCommon?.useValueInterpolation
-            ?: global?.useValueInterpolation
-            ?: globalCommon?.useValueInterpolation
-            ?: DefaultConfig.createJvmGenerateConfig(name, selfCommon, globalCommon).useValueInterpolation
-
-    override val locations
-        get() = this@create.locations
-            ?: selfCommon?.locations
-            ?: global?.locations
-            ?: globalCommon?.locations
-            ?: DefaultConfig.createJvmGenerateConfig(name, selfCommon, globalCommon).locations
 }
 
-private fun GropifyConfigureExtension.KmpGenerateConfigureScope.create(
+private fun createKmpGenerateConfig(
     name: String,
+    self: GropifyConfigureExtension.KmpGenerateConfigureScope? = null,
     global: GropifyConfigureExtension.KmpGenerateConfigureScope? = null,
+    selfSourceCode: GropifyConfigureExtension.SourceCodeGenerateConfigureScope? = null,
+    globalSourceCode: GropifyConfigureExtension.SourceCodeGenerateConfigureScope? = null,
     selfCommon: GropifyConfigureExtension.CommonGenerateConfigureScope? = null,
     globalCommon: GropifyConfigureExtension.CommonGenerateConfigureScope? = null
-) = object : GropifyConfig.KmpGenerateConfig {
-
-    override val name get() = name
-
-    override val isEnabled
-        get() = this@create.isEnabled
-            ?: selfCommon?.isEnabled
-            ?: global?.isEnabled
-            ?: globalCommon?.isEnabled
-            ?: DefaultConfig.createKmpGenerateConfig(name, selfCommon, globalCommon).isEnabled
-
-    override val generateDirPath
-        get() = this@create.generateDirPath.ifBlank { null }
-            ?: global?.generateDirPath?.ifBlank { null }
-            ?: DefaultConfig.createKmpGenerateConfig(name, selfCommon, globalCommon).generateDirPath
-
-    override val sourceSetName
-        get() = this@create.sourceSetName.ifBlank { null }
-            ?: global?.sourceSetName?.ifBlank { null }
-            ?: DefaultConfig.createKmpGenerateConfig(name, selfCommon, globalCommon).sourceSetName
-
-    override val packageName
-        get() = this@create.packageName.ifBlank { null }
-            ?: global?.packageName?.ifBlank { null }
-            ?: DefaultConfig.createKmpGenerateConfig(name, selfCommon, globalCommon).packageName
-
-    override val className
-        get() = this@create.className.ifBlank { null }
-            ?: global?.className?.ifBlank { null }
-            ?: DefaultConfig.createKmpGenerateConfig(name, selfCommon, globalCommon).className
-
-    override val isRestrictedAccessEnabled
-        get() = this@create.isRestrictedAccessEnabled
-            ?: global?.isRestrictedAccessEnabled
-            ?: DefaultConfig.createKmpGenerateConfig(name, selfCommon, globalCommon).isRestrictedAccessEnabled
-
-    override val isIsolationEnabled
-        get() = this@create.isIsolationEnabled
-            ?: global?.isIsolationEnabled
-            ?: DefaultConfig.createKmpGenerateConfig(name, selfCommon, globalCommon).isIsolationEnabled
-
-    override val existsPropertyFiles
-        get() = this@create.existsPropertyFiles
-            ?: global?.existsPropertyFiles
-            ?: DefaultConfig.createKmpGenerateConfig(name, selfCommon, globalCommon).existsPropertyFiles
-
-    override val permanentKeyValues
-        get() = this@create.permanentKeyValues
-            ?: global?.permanentKeyValues
-            ?: DefaultConfig.createKmpGenerateConfig(name, selfCommon, globalCommon).permanentKeyValues
-
-    override val replacementKeyValues
-        get() = this@create.replacementKeyValues
-            ?: global?.replacementKeyValues
-            ?: DefaultConfig.createKmpGenerateConfig(name, selfCommon, globalCommon).replacementKeyValues
-
-    override val excludeKeys
-        get() = this@create.excludeKeys
-            ?: global?.excludeKeys
-            ?: DefaultConfig.createKmpGenerateConfig(name, selfCommon, globalCommon).excludeKeys
-
-    override val includeKeys
-        get() = this@create.includeKeys
-            ?: global?.includeKeys
-            ?: DefaultConfig.createKmpGenerateConfig(name, selfCommon, globalCommon).includeKeys
-
-    override val keyValuesRules
-        get() = this@create.keyValuesRules
-            ?: global?.keyValuesRules
-            ?: DefaultConfig.createKmpGenerateConfig(name, selfCommon, globalCommon).keyValuesRules
-
-    override val excludeNonStringValue
-        get() = this@create.excludeNonStringValue
-            ?: selfCommon?.excludeNonStringValue
-            ?: global?.excludeNonStringValue
-            ?: globalCommon?.excludeNonStringValue
-            ?: DefaultConfig.createKmpGenerateConfig(name, selfCommon, globalCommon).excludeNonStringValue
-
-    override val useTypeAutoConversion
-        get() = this@create.useTypeAutoConversion
-            ?: selfCommon?.useTypeAutoConversion
-            ?: global?.useTypeAutoConversion
-            ?: globalCommon?.useTypeAutoConversion
-            ?: DefaultConfig.createKmpGenerateConfig(name, selfCommon, globalCommon).useTypeAutoConversion
-
-    override val useValueInterpolation
-        get() = this@create.useValueInterpolation
-            ?: selfCommon?.useValueInterpolation
-            ?: global?.useValueInterpolation
-            ?: globalCommon?.useValueInterpolation
-            ?: DefaultConfig.createKmpGenerateConfig(name, selfCommon, globalCommon).useValueInterpolation
-
-    override val locations
-        get() = this@create.locations
-            ?: selfCommon?.locations
-            ?: global?.locations
-            ?: globalCommon?.locations
-            ?: DefaultConfig.createKmpGenerateConfig(name, selfCommon, globalCommon).locations
-}
+) = object : GropifyConfig.KmpGenerateConfig, GropifyConfig.SourceCodeGenerateConfig by createSourceCodeGenerateConfig(
+    name = name,
+    self = listOf(self, selfSourceCode),
+    global = listOf(global, globalSourceCode),
+    selfCommon = selfCommon,
+    globalCommon = globalCommon,
+    default = DefaultConfig.createKmpGenerateConfig(name, selfCommon, globalCommon)
+) {}

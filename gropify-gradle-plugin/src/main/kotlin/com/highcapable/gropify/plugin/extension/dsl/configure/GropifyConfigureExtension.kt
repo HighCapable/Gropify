@@ -19,7 +19,10 @@
  *
  * This file is created by fankes on 2025/10/9.
  */
-@file:Suppress("unused", "MemberVisibilityCanBePrivate", "PropertyName", "DeprecatedCallableAddReplaceWith", "FunctionName")
+@file:Suppress(
+    "unused", "MemberVisibilityCanBePrivate", "PropertyName",
+    "DeprecatedCallableAddReplaceWith", "FunctionName", "RedundantInnerClassModifier"
+)
 
 package com.highcapable.gropify.plugin.extension.dsl.configure
 
@@ -97,18 +100,19 @@ open class GropifyConfigureExtension internal constructor() {
     open inner class GenerateConfigureScope internal constructor(
         internal var commonConfigure: CommonGenerateConfigureScope? = null,
         internal var buildscriptConfigure: BuildscriptGenerateConfigureScope? = null,
+        internal var sourceCodeConfigure: SourceCodeGenerateConfigureScope? = null,
         internal var androidConfigure: AndroidGenerateConfigureScope? = null,
         internal var jvmConfigure: JvmGenerateConfigureScope? = null,
         internal var kmpConfigure: KmpGenerateConfigureScope? = null
     ) {
 
         /**
-         * Please use [common], [buildscript], [android], [jvm], [kmp] to configure it.
+         * Please use [common], [buildscript], [sourceCode], [android], [jvm], [kmp] to configure it.
          * @throws IllegalStateException
          */
         @Suppress("unused")
         @Deprecated(
-            message = "Please use `common`, `buildscript`, `android`, `jvm`, `kmp` to configure it.",
+            message = "Please use `common`, `buildscript`, `sourceCode`, `android`, `jvm`, `kmp` to configure it.",
             level = DeprecationLevel.ERROR
         )
         val isEnabled: Boolean get() = Gropify.error("No getter available.")
@@ -127,7 +131,7 @@ open class GropifyConfigureExtension internal constructor() {
         /**
          * Configure common.
          *
-         * The configuration here will be applied downward to [buildscript], [android], [jvm], [kmp].
+         * The configuration here will be applied downward to [buildscript], [sourceCode], [android], [jvm], [kmp].
          */
         fun common(action: Action<CommonGenerateConfigureScope>) {
             commonConfigure = CommonGenerateConfigureScope().also { action.execute(it) }
@@ -138,6 +142,15 @@ open class GropifyConfigureExtension internal constructor() {
          */
         fun buildscript(action: Action<BuildscriptGenerateConfigureScope>) {
             buildscriptConfigure = BuildscriptGenerateConfigureScope().also { action.execute(it) }
+        }
+
+        /**
+         * Configure source code.
+         *
+         * The configuration here will be applied downward to [android], [jvm], [kmp].
+         */
+        fun sourceCode(action: Action<SourceCodeGenerateConfigureScope>) {
+            sourceCodeConfigure = SourceCodeGenerateConfigureScope().also { action.execute(it) }
         }
 
         /**
@@ -185,7 +198,7 @@ open class GropifyConfigureExtension internal constructor() {
             @JvmName("manifestPlaceholders") set
     }
 
-    open inner class JvmGenerateConfigureScope internal constructor() : CommonCodeGenerateConfigureScope() {
+    open inner class JvmGenerateConfigureScope internal constructor() : SourceCodeGenerateConfigureScope() {
 
         /**
          * Whether to use Kotlin language generation.
@@ -198,9 +211,24 @@ open class GropifyConfigureExtension internal constructor() {
             @JvmName("useKotlin") set
     }
 
-    open inner class KmpGenerateConfigureScope internal constructor() : CommonCodeGenerateConfigureScope()
+    open inner class KmpGenerateConfigureScope internal constructor() : SourceCodeGenerateConfigureScope()
 
-    abstract inner class CommonCodeGenerateConfigureScope internal constructor() : SourceCodeGenerateConfigureExtension() {
+    open inner class SourceCodeGenerateConfigureScope internal constructor() : CommonGenerateConfigureScope() {
+
+        /**
+         * Custom generated directory path.
+         *
+         * You can fill in the path relative to the current project.
+         *
+         * Format example: "path/to/your/src/main", the "src/main" is a fixed suffix.
+         *
+         * The `android`, `jvm` and `kmp` default is "build/generated/gropify/src/main".
+         *
+         * We recommend that you set the generated path under the "build" directory,
+         * which is ignored by version control systems by default.
+         */
+        var generateDirPath = ""
+            @JvmName("generateDirPath") set
 
         /**
          * Custom deployment `sourceSet` name.
@@ -258,24 +286,6 @@ open class GropifyConfigureExtension internal constructor() {
          */
         var isIsolationEnabled: Boolean? = null
             @JvmName("isolationEnabled") set
-    }
-
-    abstract inner class SourceCodeGenerateConfigureExtension internal constructor() : CommonGenerateConfigureScope() {
-
-        /**
-         * Custom generated directory path.
-         *
-         * You can fill in the path relative to the current project.
-         *
-         * Format example: "path/to/your/src/main", the "src/main" is a fixed suffix.
-         *
-         * The `android`, `jvm` and `kmp` default is "build/generated/gropify/src/main".
-         *
-         * We recommend that you set the generated path under the "build" directory,
-         * which is ignored by version control systems by default.
-         */
-        var generateDirPath = ""
-            @JvmName("generateDirPath") set
     }
 
     open inner class CommonGenerateConfigureScope internal constructor(
@@ -581,6 +591,9 @@ open class GropifyConfigureExtension internal constructor() {
         fun GenerateConfigureScope.checkingNames() {
             buildscriptConfigure?.extensionName?.checkingValidExtensionName()
 
+            sourceCodeConfigure?.packageName?.checkingPackageName()
+            sourceCodeConfigure?.className?.checkingClassName()
+
             androidConfigure?.packageName?.checkingPackageName()
             androidConfigure?.className?.checkingClassName()
 
@@ -599,7 +612,7 @@ open class GropifyConfigureExtension internal constructor() {
 
         globalConfigure.checkingNames()
 
-        Gropify.require(projectConfigures.none { (name, _) -> name.lowercase() == rootName.lowercase() }) {
+        Gropify.require(projectConfigures.none { (name, _) -> name.equals(rootName, ignoreCase = true) }) {
             "This project name '$rootName' is a root project, please use `rootProject` function to configure it, not `projects(\"$rootName\")`."
         }
 

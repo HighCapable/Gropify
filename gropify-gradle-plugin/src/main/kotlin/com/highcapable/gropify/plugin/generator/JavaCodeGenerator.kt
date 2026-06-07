@@ -46,7 +46,7 @@ internal class JavaCodeGenerator {
      * Build Java source code.
      * @return [SourceCodeSpec]
      */
-    fun build(config: GropifyConfig.CommonCodeGenerateConfig, generateConfig: GenerateConfig, keyValues: PropertyMap) = runCatching {
+    fun build(config: GropifyConfig.SourceCodeGenerateConfig, generateConfig: GenerateConfig, keyValues: PropertyMap) = runCatching {
         val className = ClassName.get(generateConfig.packageName, generateConfig.className)
 
         val typeSpec = TypeSpec.classBuilder(className).apply {
