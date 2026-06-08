@@ -12,7 +12,19 @@
 
 `Gropify` 的配置方案与 `SweetProperty` 类似，如果你正在使用 `SweetProperty`，你可以考虑将其迁移到 `Gropify`。
 
-## 用途
+## 产品对比
+
+这不是又一个普通的 `BuildConfig` 插件，以下是 `Gropify` 与社区现有方案的对比：
+
+| 功能维度             | 官方做法                                                   | 传统插件                                             | 相关产品                                                                                | Gropify                                                  |
+| -------------------- | ---------------------------------------------------------- | ---------------------------------------------------- | --------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| **Buildscript 访问** | ❌ 需手写硬编码字符串 `providers.gradleProperty("foo.bar")` | ❌ 不支持，仍需在 `.kts` 里手动读取                   | -                                                                                       | **✅ 自动生成链式访问器** `gropify.foo.bar` (带 IDE 补全) |
+| **源码常量生成**     | ❌ 仅 Android 支持 `buildConfigField`，KMP/JVM 不原生支持   | ✅ 支持生成多平台常量，但必须在 `.kts` 里显式声明字段 | [gmazzo/gradle-buildconfig-plugin](https://github.com/gmazzo/gradle-buildconfig-plugin) | **✅ 零手动声明**，直接根据 properties 自动推断并生成挂载 |
+| **KMP 源码多平台**   | ❌ 无法原生映射                                             | ✅ 支持通过 expect/actual 生成常量                    | [yshrsmz/BuildKonfig](https://github.com/yshrsmz/BuildKonfig)                           | **✅ 完美覆盖**，自动挂载至 `commonMain` 源码集           |
+| **配置冗余度**       | **❌ 高** (Key 散落在各处字符串中)                          | **⚠️ 中** (必须在 `.kts` 里手写映射关系)              | -                                                                                       | **✅ 极低** (Properties 即 Schema)                        |
+| **设计哲学**         | 散装的能力碎片                                             | CodeGen-First (代码生成工具)                         | -                                                                                       | Properties-Centric (属性中心化驱动)                      |
+
+## 功能一览
 
 `Gropify` 主要针对 Kotlin DSL 构建脚本设计，Groovy 语言可以直接将 `gradle.properties` 文件中的属性作为变量使用，但是你也可以通过 `Gropify` 来实现类型安全的属性访问。
 

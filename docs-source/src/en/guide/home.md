@@ -12,7 +12,20 @@ It is a brand-new project rebuilt from [SweetProperty](https://github.com/HighCa
 
 The configuration plan format of `Gropify` is similar to `SweetProperty`. If you are using `SweetProperty`, you can consider migrating to `Gropify`.
 
-## Usage
+## Alternatives Comparison
+
+This isn't just another ordinary `BuildConfig` plugin. Here is how `Gropify` stacks up against existing solutions in the community:
+
+| Feature Dimension            | Official Approach                                                          | Traditional Plugins                                                         | Alternatives                                                                            | Gropify                                                                              |
+| ---------------------------- | -------------------------------------------------------------------------- | --------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| **Buildscript Access**       | ❌ Hard-coded strings like `providers.gradleProperty("foo.bar")`            | ❌ Unsupported, requires manual `.kts` binding                               | -                                                                                       | **✅ Auto-generated chainable accessors** `gropify.foo.bar` (with IDE autocompletion) |
+| **Source Code Constants**    | ❌ Only Android supports `buildConfigField`, lacking native KMP/JVM support | ✅ Supports multi-platform constants, but needs explicit `.kts` declarations | [gmazzo/gradle-buildconfig-plugin](https://github.com/gmazzo/gradle-buildconfig-plugin) | **✅ Zero manual declarations**, infers and mounts directly from properties           |
+| **KMP Multiplatform**        | ❌ No native mapping                                                        | ✅ Supports expect/actual generation                                         | [yshrsmz/BuildKonfig](https://github.com/yshrsmz/BuildKonfig)                           | **✅ Flawlessly integrated**, automatically mounted to the `commonMain` source set    |
+| **Configuration Redundancy** | **❌ High** (Keys scattered as strings across files)                        | **⚠️ Medium** (Requires boilerplate mappings in `.kts`)                      | -                                                                                       | **✅ Ultra-low** (Properties act as the Schema)                                       |
+| **Design Philosophy**        | Fragmented capabilities                                                    | CodeGen-First (Code generation tooling)                                     | -                                                                                       | Properties-Centric (Single source of truth)                                          |
+
+
+## Features Overview
 
 `Gropify` is mainly designed for Kotlin DSL build scripts. Groovy can directly use properties from the `gradle.properties` file as variables, but you can still use `Gropify` to achieve type-safe property access.
 
