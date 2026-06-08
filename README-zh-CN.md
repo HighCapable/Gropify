@@ -11,7 +11,7 @@
 [English](README.md) | 简体中文
 
 | <img src="https://github.com/HighCapable/.github/blob/main/img-src/logo.jpg?raw=true" width = "30" height = "30" alt="LOGO"/> | [HighCapable](https://github.com/HighCapable) |
-|-------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------|
+| ----------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
 
 这个项目属于上述组织，**点击上方链接关注这个组织**，发现更多好项目。
 
@@ -21,26 +21,86 @@
 
 项目图标由 [MaiTungTM](https://github.com/Lagrio) 设计，名称取自 **G**radleP**ropify**，意为针对 Gradle 属性的插件。
 
-它是基于 [SweetProperty](https://github.com/HighCapable/SweetProperty) 重构的全新项目，借鉴了以往的设计方案，使得其在原有基础上更加完善和易用。
+## 产品对比
 
-`Gropify` 的配置方案与 `SweetProperty` 类似，如果你正在使用 `SweetProperty`，你可以考虑将其迁移到 `Gropify`。
+这不是又一个普通的 `BuildConfig` 插件，以下是 `Gropify` 与社区现有方案的对比：
+
+| 功能维度             | 官方做法                                                   | 传统插件                                             | 相关产品                                                                                | Gropify                                                  |
+| -------------------- | ---------------------------------------------------------- | ---------------------------------------------------- | --------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| **Buildscript 访问** | ❌ 需手写硬编码字符串 `providers.gradleProperty("foo.bar")` | ❌ 不支持，仍需在 `.kts` 里手动读取                   | -                                                                                       | **✅ 自动生成链式访问器** `gropify.foo.bar` (带 IDE 补全) |
+| **源码常量生成**     | ❌ 仅 Android 支持 `buildConfigField`，KMP/JVM 不原生支持   | ✅ 支持生成多平台常量，但必须在 `.kts` 里显式声明字段 | [gmazzo/gradle-buildconfig-plugin](https://github.com/gmazzo/gradle-buildconfig-plugin) | **✅ 零手动声明**，直接根据 properties 自动推断并生成挂载 |
+| **KMP 源码多平台**   | ❌ 无法原生映射                                             | ✅ 支持通过 expect/actual 生成常量                    | [yshrsmz/BuildKonfig](https://github.com/yshrsmz/BuildKonfig)                           | **✅ 完美覆盖**，自动挂载至 `commonMain` 源码集           |
+| **配置冗余度**       | **❌ 高** (Key 散落在各处字符串中)                          | **⚠️ 中** (必须在 `.kts` 里手写映射关系)              | -                                                                                       | **✅ 极低** (Properties 即 Schema)                        |
+| **设计哲学**         | 散装的能力碎片                                             | CodeGen-First (代码生成工具)                         | -                                                                                       | Properties-Centric (属性中心化驱动)                      |
+
+## 功能一览
+
+`Gropify` 主要针对 Kotlin DSL 构建脚本设计，Groovy 语言可以直接将 `gradle.properties` 文件中的属性作为变量使用，但是你也可以通过 `Gropify` 来实现类型安全的属性访问。
+
+`Gropify` 同时支持将类似 `gradle.properties` 文件中的属性以类型安全的方式生成到 Kotlin、Java、Android 项目的源码中以供应用程序运行时使用，功能类似 Android 的 `BuildConfig` 中的 `buildConfigField` 功能。
+
+假设我们有以下 `gradle.properties` 文件。
+
+> 示例如下
+
+```properties
+project.app.name=Gropify-Demo
+project.app.version=1.0.0
+```
+
+这是 `Gropify` 自动生成的代码调用示例。
+
+> 构建脚本 (Kotlin DSL、Groovy DSL)
+
+```kotlin
+val appName = gropify.project.app.name
+val appVersion = gropify.project.app.version
+```
+
+```groovy
+def appName = gropify.project.app.name
+def appVersion = gropify.project.app.version
+```
+
+> 源代码 (Kotlin、Java)
+
+```kotlin
+val appName = MyAppProperties.PROJECT_APP_NAME
+val appVersion = MyAppProperties.PROJECT_APP_VERSION
+```
+
+```java
+var appName = MyAppProperties.PROJECT_APP_NAME;
+var appVersion = MyAppProperties.PROJECT_APP_VERSION;
+```
+
+`Gropify` 同样支持 Kotlin Multiplatform 项目，你可以在 `commonMain` 源集中使用生成的属性类。
 
 ## 开始使用
 
-[点击这里](https://highcapable.github.io/Gropify/zh-cn) 前往文档页面查看更多详细教程和内容。
+| <img src="img-src/icon.svg" width = "30" height = "30" alt="LOGO"/> | [Gropify 文档](https://highcapable.github.io/Gropify/zh-cn) |
+| ------------------------------------------------------------------- | ----------------------------------------------------------- |
 
-## 项目推广
+你可以前往文档页面查看更多详细教程和内容。
+
+### 下一步做什么？
+1. **应用插件**: 将 `Gropify` 插件 ID 添加到你的 `settings.gradle.kts` 中。
+2. **配置属性**: 在 `gradle.properties` 中定义你的常量。
+3. **同步项目**: 在 Gradle 同步后，即可开始享受类型安全的属性访问。
+
+在打开的页面中，选择侧边栏的 **快速开始** 章节以继续阅读。
+
+## 更多项目
 
 <!--suppress HtmlDeprecatedAttribute -->
 <div align="center">
     <h2>嘿，还请君留步！👋</h2>
-    <h3>这里有 Android 开发工具、UI 设计、Gradle 插件、Xposed 模块和实用软件等相关项目。</h3>
-    <h3>如果下方的项目能为你提供帮助，不妨为我点个 star 吧！</h3>
-    <h3>所有项目免费、开源，遵循对应开源许可协议。</h3>
+    <h3>如果你觉得这个项目能给你提供帮助，不妨继续往下看看我的更多项目吧！</h3>
+    <h3>如果这些项目能为你提供帮助，不妨为我点个关注或者 star ⭐️ 吧！</h3>
     <h1><a href="https://github.com/fankes/fankes/blob/main/project-promote/README-zh-CN.md">→ 查看更多关于我的项目，请点击这里 ←</a></h1>
 </div>
 
-## Star History
+## 星标历史
 
 ![Star History Chart](https://api.star-history.com/svg?repos=HighCapable/Gropify&type=Date)
 
