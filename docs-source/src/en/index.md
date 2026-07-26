@@ -1,13 +1,17 @@
 ---
-home: true
+layout: home
 title: Home
-heroImage: /images/logo.svg
-actions:
-  - text: Get Started
-    link: /en/guide/home
-    type: primary
-  - text: Changelog
-    link: /en/about/changelog
-    type: secondary
-footer: Apache-2.0 License | Copyright (C) 2019 HighCapable
+hero:
+  name: Gropify
+  tagline: A type-safe and modern properties plugin for Gradle
+  image:
+    src: /images/logo.svg
+    alt: Gropify
+  actions:
+    - text: Get Started
+      link: /en/guide/home
+      theme: brand
+    - text: Changelog
+      link: /en/about/changelog
+      theme: alt
 ---

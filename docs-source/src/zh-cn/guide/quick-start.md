@@ -8,7 +8,7 @@
 <span style="margin-left: 5px"/>
 ![Maven metadata URL](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Fraw.githubusercontent.com%2FHighCapable%2Fmaven-repository%2Frefs%2Fheads%2Fmain%2Frepository%2Freleases%2Fcom%2Fhighcapable%2Fgropify%2Fcom.highcapable.gropify.gradle.plugin%2Fmaven-metadata.xml&logo=apachemaven&logoColor=orange&label=highcapable-maven-releases&style=flat-square)
 
-`Gropify` 的依赖发布在 **Maven Central** 和我们的公共存储库中，你可以使用如下方式配置存储库。
+Gropify 的依赖发布在 **Maven Central** 和我们的公共存储库中，你可以使用如下方式配置存储库。
 
 我们建议使用不低于 `7.x.x` 版本的 Gradle，并推荐使用 Kotlin DSL 作为 Gradle 构建脚本语言，文档中将不再详细介绍在 Groovy DSL 中的使用方法。
 
@@ -34,7 +34,7 @@ pluginManagement {
 }
 ```
 
-然后在 `settings.gradle.kts` 中 `plugin` 添加 `Gropify` 插件依赖，请注意**不要**在后方加入 `apply false`。
+然后在 `settings.gradle.kts` 中 `plugin` 添加 Gropify 插件依赖，请注意**不要**在后方加入 `apply false`。
 
 > 示例如下
 
@@ -48,21 +48,21 @@ plugins {
 
 上述配置完成后，运行一次 Gradle Sync。
 
-`Gropify` 将会自动搜索根项目和每个子项目中的 `gradle.properties` 文件，并读取其中的属性键值，为每个项目生成对应的代码。
+Gropify 将会自动搜索根项目和每个子项目中的 `gradle.properties` 文件，并读取其中的属性键值，为每个项目生成对应的代码。
 
 ::: warning
 
-`Gropify` 只能被应用到 `settings.gradle.kts` 中，配置一次即可全局生效，请勿将其应用到 `build.gradle.kts` 中，否则功能将会无效。
+Gropify 只能被应用到 `settings.gradle.kts` 中，配置一次即可全局生效，请勿将其应用到 `build.gradle.kts` 中，否则功能将会无效。
 
 :::
 
 ## 功能配置
 
-你可以对 `Gropify` 进行配置来实现自定义和个性化功能。
+你可以对 Gropify 进行配置来实现自定义和个性化功能。
 
-`Gropify` 为你提供了相对丰富的可自定义功能，下面是这些功能的说明与配置方法。
+Gropify 为你提供了相对丰富的可自定义功能，下面是这些功能的说明与配置方法。
 
-请在你的 `settings.gradle.kts` 中添加 `gropify` 方法块以开始配置 `Gropify`。
+请在你的 `settings.gradle.kts` 中添加 `gropify` 方法块以开始配置 Gropify。
 
 如需在 Groovy DSL 中使用，请将所有变量的 `=` 改为空格，并删除 `Enabled` 前方的 `is` 即可。
 
@@ -87,7 +87,7 @@ gropify {
 }
 ```
 
-`Gropify` 的配置模式分为 `global` 全局配置和 `rootProject`、`projects` 根项目和子项目配置三种。
+Gropify 的配置模式分为 `global` 全局配置和 `rootProject`、`projects` 根项目和子项目配置三种。
 
 你可以在子项的代码块中继续配置和集成顶层项目的配置。
 
@@ -337,7 +337,7 @@ common {
 import com.highcapable.gropify.plugin.config.type.GropifyLocation
 ```
 
-`Gropify` 对此做了 alias 处理，你可以直接删除此 import 语句。
+Gropify 对此做了 alias 处理，你可以直接删除此 import 语句。
 
 :::
 
@@ -693,7 +693,7 @@ project.targetSdk=36
 project.minSdk=26
 ```
 
-当你设置了 `useTypeAutoConversion = true` 时，`Gropify` 在生成实体类过程在默认配置下将尝试将其转换为对应的类型。
+当你设置了 `useTypeAutoConversion = true` 时，Gropify 在生成实体类过程在默认配置下将尝试将其转换为对应的类型。
 
 例如下方所使用的键值，其类型可被识别为字符串和整型，可被项目配置直接使用。
 
@@ -711,7 +711,7 @@ android {
 }
 ```
 
-当你设置了 `manifestPlaceholders = true` 时，`Gropify` 将自动将这些属性键值同步到 `android` 配置方法块中的 `manifestPlaceholders`。
+当你设置了 `manifestPlaceholders = true` 时，Gropify 将自动将这些属性键值同步到 `android` 配置方法块中的 `manifestPlaceholders`。
 
 此时你可以直接在 `AndroidManifest.xml` 中使用这些占位符。
 
@@ -729,11 +729,11 @@ android {
 </manifest>
 ```
 
-你可以无需再使用 `buildConfigField` 向 `BuildConfig` 添加代码，有了 `Gropify` 生成的属性键值代码，你可以更加灵活地管理你的项目。
+你可以无需再使用 `buildConfigField` 向 `BuildConfig` 添加代码，有了 Gropify 生成的属性键值代码，你可以更加灵活地管理你的项目。
 
 你还可以在属性键值中使用插值 `${...}` 互相引用其中的内容，但不允许递归引用。
 
-当你设置了 `useValueInterpolation = true` 时，`Gropify` 将自动合并这些引用的内容到对应位置。
+当你设置了 `useValueInterpolation = true` 时，Gropify 将自动合并这些引用的内容到对应位置。
 
 > 示例如下
 
@@ -756,7 +756,7 @@ project.secretKey=${SECRET_KEY}
 
 ::: warning
 
-这个特性是 `Gropify` 提供的，原生的 `gradle.properties` 并不支持此功能。
+这个特性是 Gropify 提供的，原生的 `gradle.properties` 并不支持此功能。
 
 插值内容通过 `locations` 的层级自上而下进行查找替换，如果存在重复的键值名称，将使用最后查找到的内容进行替换。
 
@@ -771,4 +771,4 @@ project.secretKey=${SECRET_KEY}
 
 ## 局限性说明
 
-`Gropify` 无法生成 `settings.gradle.kts` 中的扩展方法，因为这属于 `Gropify` 的上游。
+Gropify 无法生成 `settings.gradle.kts` 中的扩展方法，因为这属于 Gropify 的上游。

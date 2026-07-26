@@ -10,13 +10,11 @@ We will only maintain the latest API version. If you are using an outdated API v
 
 ::: warning
 
-To avoid translation time consumption, Changelog will use **Google Translation** from **Chinese** to **English**, please refer to the original text for actual reference.
-
 Time zone of version release date: **UTC+8**
 
 :::
 
-### 1.0.2 | 2026.06.08 &ensp;<Badge type="tip" text="latest" vertical="middle" />
+### 1.0.2 | 2026.06.08 &ensp;<Badge type="latest" text="latest" vertical="middle" />
 
 - Optimized the buildscript accessors cache generation process, fixed the issue where multiple Gradle Daemons may read incomplete artifacts during simultaneous initialization
 - Optimized the integrity check for the buildscript accessors cache to prevent damaged `jar`, `pom`, or unready cache from being added to the buildscript classpath

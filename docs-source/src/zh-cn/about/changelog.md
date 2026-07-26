@@ -8,7 +8,7 @@
 
 :::
 
-### 1.0.2 | 2026.06.08 &ensp;<Badge type="tip" text="最新" vertical="middle" />
+### 1.0.2 | 2026.06.08 &ensp;<Badge type="latest" text="最新" vertical="middle" />
 
 - 优化构建脚本访问器缓存的生成流程，修复多个 Gradle Daemon 同时初始化时可能读取到未完成产物的问题
 - 优化构建脚本访问器缓存的完整性校验，避免损坏的 `jar`、`pom` 或未就绪的缓存被加入构建脚本类路径

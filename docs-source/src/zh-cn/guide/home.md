@@ -10,11 +10,11 @@
 
 它是基于 [SweetProperty](https://github.com/HighCapable/SweetProperty) 重构的全新项目，借鉴了以往的设计方案，使得其在原有基础上更加完善和易用。
 
-`Gropify` 的配置方案与 `SweetProperty` 类似，如果你正在使用 `SweetProperty`，你可以考虑将其迁移到 `Gropify`。
+Gropify 的配置方案与 SweetProperty 类似，如果你正在使用 SweetProperty，你可以考虑将其迁移到 Gropify。
 
 ## 产品对比
 
-这不是又一个普通的 `BuildConfig` 插件，以下是 `Gropify` 与社区现有方案的对比：
+这不是又一个普通的 `BuildConfig` 插件，以下是 Gropify 与社区现有方案的对比：
 
 | 功能维度             | 官方做法                                                   | 传统插件                                             | 相关产品                                                                                | Gropify                                                  |
 | -------------------- | ---------------------------------------------------------- | ---------------------------------------------------- | --------------------------------------------------------------------------------------- | -------------------------------------------------------- |
@@ -26,9 +26,9 @@
 
 ## 功能一览
 
-`Gropify` 主要针对 Kotlin DSL 构建脚本设计，Groovy 语言可以直接将 `gradle.properties` 文件中的属性作为变量使用，但是你也可以通过 `Gropify` 来实现类型安全的属性访问。
+Gropify 主要针对 Kotlin DSL 构建脚本设计，Groovy 语言可以直接将 `gradle.properties` 文件中的属性作为变量使用，但是你也可以通过 Gropify 来实现类型安全的属性访问。
 
-`Gropify` 同时支持将类似 `gradle.properties` 文件中的属性以类型安全的方式生成到 Kotlin、Java、Android 项目的源码中以供应用程序运行时使用，功能类似 Android 的 `BuildConfig` 中的 `buildConfigField` 功能。
+Gropify 同时支持将类似 `gradle.properties` 文件中的属性以类型安全的方式生成到 Kotlin、Java、Android 项目的源码中以供应用程序运行时使用，功能类似 Android 的 `BuildConfig` 中的 `buildConfigField` 功能。
 
 假设我们有以下 `gradle.properties` 文件。
 
@@ -39,7 +39,7 @@ project.app.name=Gropify-Demo
 project.app.version=1.0.0
 ```
 
-这是 `Gropify` 自动生成的代码调用示例。
+这是 Gropify 自动生成的代码调用示例。
 
 > 构建脚本 (Kotlin DSL、Groovy DSL)
 
@@ -65,7 +65,7 @@ var appName = MyAppProperties.PROJECT_APP_NAME;
 var appVersion = MyAppProperties.PROJECT_APP_VERSION;
 ```
 
-`Gropify` 同样支持 Kotlin Multiplatform 项目，你可以在 `commonMain` 源集中使用生成的属性类。
+Gropify 同样支持 Kotlin Multiplatform 项目，你可以在 `commonMain` 源集中使用生成的属性类。
 
 ## 语言要求
 

@@ -8,5 +8,5 @@
 
 ### Support More Project Types
 
-`Gropify` currently supports generating properties into the source code of Kotlin, Java, and Android projects.
+Gropify currently supports generating properties into the source code of Kotlin, Java, and Android projects.
 In the future, it may support more projects that can participate in Gradle builds, such as C/C++ (Android JNI), Swift, etc., to meet the needs of more developers.

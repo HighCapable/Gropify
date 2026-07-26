@@ -25,8 +25,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
-      - name: Build VuePress site
+          node-version: 22
+      - name: Build VitePress site
         run: |
           cd docs-source
           yarn -i
