@@ -2,15 +2,15 @@ import {
     GitChangelog,
     GitChangelogMarkdownSection
 } from '@nolebase/vitepress-plugin-git-changelog/vite';
-import { defineConfig } from 'vitepress';
+import { defineConfig, type DefaultTheme, type UserConfigFn } from 'vitepress';
 import { alignI18nAnchors } from './configs/anchors';
 import { createHomepageAlternates, createRootLocaleRedirect } from './configs/i18n';
 import { configs, pageLinkRefs } from './configs/template';
-import { env, markdown } from './configs/utils';
+import { markdown } from './configs/utils';
 import locales from './locales';
 
 /** Gropify documentation site configuration. */
-export default defineConfig({
+const createConfig: UserConfigFn<DefaultTheme.Config> = ({ command }) => defineConfig({
     base: configs.website.base,
     title: configs.website.title,
     description: configs.website.locales.en.description,
@@ -73,7 +73,7 @@ export default defineConfig({
         config: (md) => {
             md.use(alignI18nAnchors);
             markdown.localizeContainerTitles(md);
-            markdown.injectLinks(md, env.dev ? pageLinkRefs.dev : pageLinkRefs.prod, configs.website.base);
+            markdown.injectLinks(md, command === 'serve' ? pageLinkRefs.dev : pageLinkRefs.prod, configs.website.base);
         }
     },
     themeConfig: {
@@ -114,3 +114,5 @@ export default defineConfig({
         }
     }
 });
+
+export default createConfig;
