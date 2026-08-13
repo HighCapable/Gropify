@@ -107,7 +107,7 @@ In the opened page, select the **Quick Start** section in the sidebar to continu
 
 ## Star History
 
-![Star History Chart](https://api.star-history.com/svg?repos=HighCapable/Gropify&type=Date)
+[![Star History Chart](https://api.star-history.com/chart?repos=HighCapable/Gropify&type=date&legend=top-left&sealed_token=DKdgLvoDkJpu-aigm1ZMqatwfD3zfWIA_XPRxOS_sgWhRnCwBX349n4gqEdTLsKS5azYMRT3dDYoiM-sSGa9ghmruk-mSUvVooQJ5gC6p3zWrR-otVZc9w)](https://www.star-history.com/?repos=HighCapable%2FGropify&type=date&legend=top-left)
 
 ## License
 

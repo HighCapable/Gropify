@@ -102,9 +102,9 @@ Gropify 同样支持 Kotlin Multiplatform 项目，你可以在 `commonMain` 源
     <h1><a href="https://github.com/fankes/fankes/blob/main/project-promote/README-zh-CN.md">→ 查看更多关于我的项目，请点击这里 ←</a></h1>
 </div>
 
-## 星标历史
+## Star History
 
-![Star History Chart](https://api.star-history.com/svg?repos=HighCapable/Gropify&type=Date)
+[![Star History Chart](https://api.star-history.com/chart?repos=HighCapable/Gropify&type=date&legend=top-left&sealed_token=DKdgLvoDkJpu-aigm1ZMqatwfD3zfWIA_XPRxOS_sgWhRnCwBX349n4gqEdTLsKS5azYMRT3dDYoiM-sSGa9ghmruk-mSUvVooQJ5gC6p3zWrR-otVZc9w)](https://www.star-history.com/?repos=HighCapable%2FGropify&type=date&legend=top-left)
 
 ## 许可证
 
